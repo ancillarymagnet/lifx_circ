@@ -19,29 +19,20 @@ import time
 from pprint import pprint
 
 import ephem
+import lifx_api_creds
 import requests
+
 #import tornado.websocket
 #import tornado.httpserver
 #import tornado.ioloop
 
 VERBOSE = 1
-TOKEN = "ceba30aa6fb710396f536a496b06b94a00f2eeec29065f53edb8da896dc4234e"
 LIFX_URL = "https://api.lifx.com/v1/"
 STATE_URL = "https://api.lifx.com/v1/lights/all/state"
-HEADERS = {
-    "Authorization": "Bearer %s" % TOKEN,
-}
 SWITCH_OFF_FADEOUT = 3.0
-OVERNIGHT = 0.0
-SUNRISE = 0.3125 # override with ephem
-MIDMORN = 0.41666 # 10am
-MIDDAY = 0.541666 # 1pm
-SUNSET = 0.8125 # override with ephem
-BED = 0.9375
-TIMES = [OVERNIGHT, SUNRISE, MIDMORN, MIDDAY, SUNSET, BED]
-STATES = OrderedDict()
+SWITCH_ON_FADEIN = 1.0
 
-lights_on = False
+lights_on = True
 
 class LightState():
     def __init__(self, name, bright, start, 
@@ -58,7 +49,7 @@ class LightState():
             self.type = "color"
         
     def __repr__(self):
-        rep = "LightState name: {}, ".format(self.name)
+        rep = "///LS NAME: {}, ".format(self.name)
         rep += "bright: {}, ".format(self.bright)
         rep += "start: {}, ".format(self.start)
         rep += "hue: {}, ".format(self.hue)
@@ -99,18 +90,9 @@ class LightState():
 #    def check_origin(self, origin):
 #        return True
 
-def init_states():
-    # for each entry in JSON add to ordered dictionary
-    STATES['overnight'] = {'start':OVERNIGHT, 'hue':0, 'sat':1.0, 'bright':0.02}
-    STATES['sunrise'] = {'start':SUNRISE, 'hue':30, 'sat':1.0, 'bright':0.65}
-    STATES['mid-morn'] = {'start':MIDMORN, 'kelvin':4000, 'bright':0.8}
-    STATES['mid-day'] = {'start':MIDDAY, 'kelvin':5500, 'bright':1.0}
-    STATES['dinner'] = {'start':SUNSET, 'hue':50, 'sat':1.0, 'bright':0.55}
-    STATES['bed'] = {'start':BED, 'hue':20, 'sat':1.0, 'bright':0.05}
-
 def test_connection():
     response = requests.get('https://api.lifx.com/v1/lights/all',
-                            headers=HEADERS)
+                            headers=lifx_api_creds.headers)
     response_json = json.loads(response.text)
     print 'TESTING.......'
     if VERBOSE:
@@ -230,7 +212,7 @@ def switch_on():
                         k,h,s,next_bright,dur_secs)
             else:
                 kel = v['kelvin']
-                set_all_to_kelvin(kel,next_bright,dur_secs)
+                set_all_to_white(kel,next_bright,dur_secs)
                 if VERBOSE:
                     print 'setting next state {}: k:{} b:{} d:{}'.format(
                         k,kel,next_bright,dur_secs)
@@ -238,6 +220,75 @@ def switch_on():
         else:
             prev_start = next_start
             prev_key = k
+    # go_to_state(state,duration)
+
+def switch_on_from(lut):
+    global lights_on
+    lights_on = True
+    
+    cur_time = secs_to_day_frac(secs_into_day())
+    if VERBOSE:
+        print 'cur_time frac: ', cur_time
+        print_time_from_day_frac(cur_time)
+    prev_start = 0.0
+    prev_key = 'none'
+    
+    for i in range(0,len(lut)-1):
+        st = lut[i]
+        next_start = st.start
+        if next_start > cur_time:
+            if VERBOSE:
+                print('currently in state: '+str(prev_key))
+                print('current state start time: ' + str(prev_start))
+                print('next state start time: ' + str(next_start))
+
+            # calculate how far we are into the current state
+            time_in = cur_time - prev_start
+            if VERBOSE:
+                print('abs time in to this state: ' + str(time_in))
+
+            # calculate what percentage we are into the current state
+            frac_in  = time_in / (next_start - prev_start)
+            if VERBOSE:
+                print ('frac in: ' + str(frac_in))
+        
+            # calculate pro-rated brightness for current state
+            # THIS IS FUCKED UP
+            prev_bright = lut[i-1].bright
+            next_bright = st.bright
+            cur_bright = frac_in * (next_bright - prev_bright) + prev_bright
+            if VERBOSE:
+                print 'cur_bright: ', cur_bright
+
+            # calculate remaining duration in current state
+            dur = next_start - cur_time
+            dur_secs = day_frac_to_secs(dur)
+            if VERBOSE:
+                print('dur secs remaining: ' + str(dur_secs))
+                
+            # switch on at current pro-rated brightness over 1s    
+            # this is making the assumption that the previous state's
+            # color / k is already set
+            set_all_to_bright(cur_bright,SWITCH_ON_FADEIN)
+            time.sleep(SWITCH_ON_FADEIN)
+            # check if next state is a color or white and transish
+            if st.is_color():
+                h = st.hue
+                s = st.sat
+                set_all_to_color(h,s,next_bright,dur_secs)
+                if VERBOSE:
+                    print 'setting next state {}: h:{} s:{} b:{} d:{}'.format(
+                        st.name,h,s,next_bright,dur_secs)
+            else:
+                kel = st.kelvin
+                set_all_to_white(kel,next_bright,dur_secs)
+                if VERBOSE:
+                    print 'setting next state {}: k:{} b:{} d:{}'.format(
+                        st.name,kel,next_bright,dur_secs)
+            break
+        else:
+            prev_start = next_start
+            prev_key = st.name
     # go_to_state(state,duration)
 
 def switch_off():
@@ -256,24 +307,24 @@ def put_request(c_s, duration):
          'color':c_s,
          'duration':duration,
          })
-    r = requests.put(STATE_URL, data, headers=HEADERS)
+    r = requests.put(STATE_URL, data, headers=lifx_api_creds.headers)
     print (r)
 
-def go_to_state(s,duration):
-    if not STATES.has_key(s):
-        print('invalid state: ' + str(s))
-    else:
-        state = STATES[s]
-        b = state['bright']
-        if state.has_key('kelvin'):
-            k = state['kelvin']
-            set_all_to_kelvin(k,b,duration)
-        else:
-            h = state['hue']
-            s = state['sat']
-            set_all_to_color(h,s,b,duration)
+#def go_to_state(s,duration):
+#    if not STATES.has_key(s):
+#        print('invalid state: ' + str(s))
+#    else:
+#        state = STATES[s]
+#        b = state['bright']
+#        if state.has_key('kelvin'):
+#            k = state['kelvin']
+#            set_all_to_white(k,b,duration)
+#        else:
+#            h = state['hue']
+#            s = state['sat']
+#            set_all_to_color(h,s,b,duration)
 
-def set_all_to_kelvin(kelvin,brightness,duration):
+def set_all_to_white(kelvin,brightness,duration):
     if not lights_on:
         brightness = 0
     c_s = str('kelvin:'+str(kelvin)+
@@ -298,20 +349,36 @@ def set_all_to_bright(brightness,duration):
 
 def load_file():
     with open('data.json') as data_file:    
-        data = json.load(data_file)
-        
-    pprint(data)
-    print 'token: ' + data['token']
+        return json.load(data_file)
+#    pprint(data)
+#    for entry in data:
+#        print entry
 
+def build_lut(data):
+    states = data['states']
+    lut = []
+    for s in states:
+        if s.has_key('hue'):
+            ls = LightState(s['name'],s['bright'],s['start'],s['hue'],s['sat'])
+        else:
+            ls = LightState(s['name'],s['bright'],s['start'],
+                            kelvin = s['kelvin'])
+        lut.append(ls)
+    return lut
 
-init_states()
+#init_states()
 test_connection()
-set_all_to_color(20,1.0,0.74,1.0)
-switch_on()
-load_file()
-test_state = LightState("test",1.0,0.57,kelvin=5000)
-print test_state
-print test_state.is_white()
+set_all_to_white(5500,0.8,1.0)
+#switch_on()
+data = load_file()
+print 'HEADERS: ', lifx_api_creds.headers
+#token = data['token']
+#headers = {
+#    "Authorization": "Bearer %s" % token,
+#}
+lut = build_lut(data)
+print 'LUT: ', lut
+switch_on_from(lut)
 #switch_off()
 
 
@@ -328,24 +395,3 @@ today_length = next_rise - next_set
 
 #print( next_rise.timetuple().tm_hour )
 
-
-#test_connection()
-#set_all_to_color(240,1.0,1.0,5.0)
-#time.sleep(5)
-#set_all_to_kelvin(2500,1.0,1.0)
-#test_connection()
-
-
-
-
-
-
-"""
-{
-  "selector": "all",
-  "power": "on",
-  "color": "blue saturation:0.5",
-  "brightness": 0.5,
-  "duration": 5
-}
-"""
