@@ -7,7 +7,6 @@
 	{"name":"dinner", "start":0.8125, "hue":50, "sat":1.0, "bright":0.55},
 	{"name":"bed", "start":0.9375, "hue":20, "sat":1.0, "bright":0.05}
 	],
-	"token":"ceba30aa6fb710396f536a496b06b94a00f2eeec29065f53edb8da896dc4234e",
 	"lat":40.677459,
 	"long":-73.963367
 }
