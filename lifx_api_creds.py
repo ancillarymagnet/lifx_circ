@@ -7,7 +7,7 @@ Created on Wed Oct 21 13:08:21 2015
 import json
 
 def load_data():  
-    with open('data.json') as data_file:    
+    with open('user_data.json') as data_file:    
         return json.load(data_file)
         
 def generate_token():

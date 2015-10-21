@@ -149,79 +149,6 @@ def print_time_from_day_frac(day_frac):
     print str_to_print
     return str_to_print
 
-def switch_on():
-    # figure out where we are, fractionally, in the day
-    # figure out where we are, fractionally, between keys
-    # 'jump' into that key with the pro-rated brightness xition to the next
-    global lights_on
-    lights_on = True
-    cur_time = secs_to_day_frac(secs_into_day())
-    if VERBOSE:
-        print 'cur_time frac: ', cur_time
-        print_time_from_day_frac(cur_time)
-    prev_start = 0.0
-    prev_key = 'none'
-
-    for st in STATES.items():
-        k,v = st
-        next_start = v['start']
-#        if VERBOSE:
-#            print 'next_start pre-comparison: ' + str(next_start)
-#            print 'prev_start pre-comparison: ' + str(prev_start)
-
-        if next_start > cur_time:
-            if VERBOSE:
-                print('currently in state: '+str(prev_key))
-                print('current state start time: ' + str(prev_start))
-                print('next state start time: ' + str(next_start))
-
-            # calculate how far we are into the current state
-            time_in = cur_time - prev_start
-            if VERBOSE:
-                print('abs time in to this state: ' + str(time_in))
-
-            # calculate what percentage we are into the current state
-            frac_in  = time_in / (next_start - prev_start)
-            if VERBOSE:
-                print ('frac in: ' + str(frac_in))
-
-            # calculate pro-rated brightness for current state
-            prev_bright = STATES[prev_key]['bright']
-            next_bright = v['bright']
-            cur_bright = frac_in * (next_bright - prev_bright) + prev_bright
-            if VERBOSE:
-                print 'cur_bright: ', cur_bright
-
-            # calculate remaining duration in current state
-            dur = next_start - cur_time
-            dur_secs = day_frac_to_secs(dur)
-            if VERBOSE:
-                print('dur secs remaining: ' + str(dur_secs))
-                
-            # this is making the assumption that the previous state's
-            # color / k is already set
-            set_all_to_bright(cur_bright,1.0)
-            time.sleep(1.0)
-            # check if next state is a color or kelvin and transish
-            if v.has_key('hue'):
-                h = v['hue']
-                s = v['sat']
-                set_all_to_color(h,s,next_bright,dur_secs)
-                if VERBOSE:
-                    print 'setting next state {}: h:{} s:{} b:{} d:{}'.format(
-                        k,h,s,next_bright,dur_secs)
-            else:
-                kel = v['kelvin']
-                set_all_to_white(kel,next_bright,dur_secs)
-                if VERBOSE:
-                    print 'setting next state {}: k:{} b:{} d:{}'.format(
-                        k,kel,next_bright,dur_secs)
-            break
-        else:
-            prev_start = next_start
-            prev_key = k
-    # go_to_state(state,duration)
-
 def switch_on_from(lut):
     global lights_on
     lights_on = True
@@ -275,16 +202,17 @@ def switch_on_from(lut):
             if st.is_color():
                 h = st.hue
                 s = st.sat
-                set_all_to_color(h,s,next_bright,dur_secs)
                 if VERBOSE:
                     print 'setting next state {}: h:{} s:{} b:{} d:{}'.format(
                         st.name,h,s,next_bright,dur_secs)
+                set_all_to_color(h,s,next_bright,dur_secs)
+
             else:
                 kel = st.kelvin
-                set_all_to_white(kel,next_bright,dur_secs)
                 if VERBOSE:
                     print 'setting next state {}: k:{} b:{} d:{}'.format(
                         st.name,kel,next_bright,dur_secs)
+                set_all_to_white(kel,next_bright,dur_secs)
             break
         else:
             prev_start = next_start
@@ -351,8 +279,6 @@ def load_file():
     with open('data.json') as data_file:    
         return json.load(data_file)
 #    pprint(data)
-#    for entry in data:
-#        print entry
 
 def build_lut(data):
     states = data['states']
@@ -372,10 +298,6 @@ set_all_to_white(5500,0.8,1.0)
 #switch_on()
 data = load_file()
 print 'HEADERS: ', lifx_api_creds.headers
-#token = data['token']
-#headers = {
-#    "Authorization": "Bearer %s" % token,
-#}
 lut = build_lut(data)
 print 'LUT: ', lut
 switch_on_from(lut)
