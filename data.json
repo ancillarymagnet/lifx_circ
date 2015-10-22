@@ -2,8 +2,8 @@
 	"states":[
 	{"name":"overnight", "start":0.0, "hue":0, "sat":1.0, "bright":0.02},
 	{"name":"sunrise", "start":0.3125, "hue":30, "sat":1.0, "bright":0.65},
-	{"name":"mid-morn", "start":0.4166, "kelvin":4000, "bright":0.8},
-	{"name":"mid-day", "start":0.5416, "kelvin":5500, "bright":1.0},
+	{"name":"mid-morn", "start":0.4166, "bright":0.8, "kelvin":4000},
+	{"name":"mid-day", "start":0.5416, "bright":1.0, "kelvin":5500},
 	{"name":"dinner", "start":0.8125, "hue":50, "sat":1.0, "bright":0.55},
 	{"name":"bed", "start":0.9375, "hue":20, "sat":1.0, "bright":0.05}
 	],

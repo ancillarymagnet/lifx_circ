@@ -12,16 +12,16 @@ TO DO:
 """
 
 from datetime import datetime
-from collections import OrderedDict
-from math import floor
 import json
-import time
+from math import floor
 from pprint import pprint
+import requests
+import time
+import multiprocessing
+import subprocess
 
 import ephem
 import lifx_api_creds
-import requests
-
 #import tornado.websocket
 #import tornado.httpserver
 #import tornado.ioloop
@@ -95,8 +95,8 @@ def test_connection():
                             headers=lifx_api_creds.headers)
     response_json = json.loads(response.text)
     print 'TESTING.......'
-    if VERBOSE:
-        print response_json
+#    if VERBOSE:
+#        print response_json
     print '-----------------'
     light_num = 0
     for r in response_json:
@@ -266,6 +266,15 @@ def set_all_to_color(hue,saturation,brightness,duration):
             ' saturation:'+str(saturation)+
             ' brightness:'+str(brightness))
     put_request(c_s,duration)
+    
+def set_all_to_hsbk(hue,saturation,brightness,kelvin,duration):
+    if not lights_on:
+        brightness = 0
+    c_s = str('hue:'+str(hue)+
+            ' saturation:'+str(saturation)+
+            ' brightness:'+str(brightness)+
+            ' kelvin:'+str(kelvin))
+    put_request(c_s,duration)
 
 def set_all_to_bright(brightness,duration):
     if not lights_on:
@@ -292,15 +301,79 @@ def build_lut(data):
         lut.append(ls)
     return lut
 
+#def popenAndCall(onExit, popenArgs):
+#    """
+#    Runs the given args in a subprocess.Popen, and then calls the function
+#    onExit when the subprocess completes.
+#    onExit is a callable object, and popenArgs is a list/tuple of args that 
+#    would give to subprocess.Popen.
+#    """
+#    def runInThread(onExit, popenArgs):
+#        proc = subprocess.Popen(*popenArgs)
+#        proc.wait()
+#        onExit()
+#        return
+#    process = multiprocessing.Process(target=runInThread, args=(onExit, popenArgs))
+#    process.start()
+#    # returns immediately after the thread starts
+#    return process
+
+def onExit():
+    print 'IM BACK MUTHAFUCK: '
+
 #init_states()
-test_connection()
-set_all_to_white(5500,0.8,1.0)
+#set_all_to_hsbk(0,1.0,0.67,2500,1.0)
+#time.sleep(1)
+#print 'BEFORE HUE 0>>>>>>>>>>>>>>>>>>>>>>>>>>>>>'
+#test_connection()
+#set_all_to_color(0,1.0,0.67,1.0)
+#time.sleep(1)
+#print 'AFTER HUE 0>>>>>>>>>>>>>>>>>>>>>>>>>>>>>'
+#test_connection()
+#set_all_to_hsbk(0,1.0,0.67,9000,10.0)
+#test_connection()
+#test_connection()
+#test_connection()
+#test_connection()
+#test_connection()
+#test_connection()
+#test_connection()
+#test_connection()
+#test_connection()
+#test_connection()
+#time.sleep(10)
+#print 'AFTER 9000 K>>>>>>>>>>>>>>>>>>>>>>>>>>>>>'
+#test_connection()
+
+#set_all_to_hsbk(0,1.0,0.5,2500,1.0)
+set_all_to_color(0,1.0,0.5,1.0)
+print 'starting long change'
+set_all_to_color(180,1.0,0.5,100)
+time.sleep(10)
+set_all_to_bright(0.0,1.0)
+time.sleep(10)
+set_all_to_bright(0.5,1.0)
+print 'all done'
+
+#set_all_to_hsbk(0,1.0,0.5,9000,0)
+#set_all_to_color(0,1.0,0.5,0)
+#time.sleep(1)
+#print 'BEFORE K9000>>>>>>>>>>>>>>>>>>>>>>>>>>>>>'
+#test_connection()
+#set_all_to_hsbk(0,1.0,0.5,9000,10.0)
+#time.sleep(10)
+#print 'AFTER K9000>>>>>>>>>>>>>>>>>>>>>>>>>>>>>'
+#test_connection()
+#set_all_to_hsbk(0,1.0,0.67,9000,10.0)
+
+# HSB1->KB2 ... H=H, S->0, K=K, B1->B2
+
 #switch_on()
 data = load_file()
 print 'HEADERS: ', lifx_api_creds.headers
 lut = build_lut(data)
 print 'LUT: ', lut
-switch_on_from(lut)
+#switch_on_from(lut)
 #switch_off()
 
 
