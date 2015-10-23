@@ -159,8 +159,12 @@ def switch_on_from(lut):
         print_time_from_day_frac(cur_time)
     prev_start = 0.0
     prev_key = 'none'
-    
+
     for i in range(0,len(lut)-1):
+        if i is 0:
+            prev_index = len(lut) - 1
+        else:
+            prev_index = i - 1
         st = lut[i]
         next_start = st.start
         if next_start > cur_time:
@@ -179,13 +183,33 @@ def switch_on_from(lut):
             if VERBOSE:
                 print ('frac in: ' + str(frac_in))
         
-            # calculate pro-rated brightness for current state
-            # THIS IS FUCKED UP
-            prev_bright = lut[i-1].bright
+            # calculate interpolated hue
+            prev_hue = lut[prev_index].hue
+            next_hue = st.hue
+            cur_hue = frac_in * (next_hue - prev_hue) + prev_hue
+            if VERBOSE:
+                print 'cur_hue: ', cur_hue            
+            
+            # calculate interpolated saturation
+            prev_sat = lut[prev_index].sat
+            next_sat = st.sat
+            cur_sat = frac_in * (next_sat - prev_sat) + prev_sat
+            if VERBOSE:
+                print 'cur_sat: ', cur_sat            
+            
+            # calculate interpolated brightness
+            prev_bright = lut[prev_index].bright
             next_bright = st.bright
             cur_bright = frac_in * (next_bright - prev_bright) + prev_bright
             if VERBOSE:
                 print 'cur_bright: ', cur_bright
+                
+            # calculate interpolated kelvin
+            prev_kelvin = lut[prev_index].kelvin
+            next_kelvin = st.kelvin
+            cur_kelvin = frac_in * (next_kelvin - prev_kelvin) + prev_kelvin
+            if VERBOSE:
+                print 'cur_kelvin: ', cur_kelvin
 
             # calculate remaining duration in current state
             dur = next_start - cur_time
@@ -193,10 +217,9 @@ def switch_on_from(lut):
             if VERBOSE:
                 print('dur secs remaining: ' + str(dur_secs))
                 
-            # switch on at current pro-rated brightness over 1s    
-            # this is making the assumption that the previous state's
-            # color / k is already set
-            set_all_to_bright(cur_bright,SWITCH_ON_FADEIN)
+            # switch on at current pro-rated settings over 1s    
+            set_all_to_hsbk(cur_hue, cur_sat, cur_brightness, 
+                            cur_kelvin, SWITCH_ON_FADEIN)
             time.sleep(SWITCH_ON_FADEIN)
             # check if next state is a color or white and transish
             if st.is_color():
@@ -205,14 +228,14 @@ def switch_on_from(lut):
                 if VERBOSE:
                     print 'setting next state {}: h:{} s:{} b:{} d:{}'.format(
                         st.name,h,s,next_bright,dur_secs)
-                set_all_to_color(h,s,next_bright,dur_secs)
+                set_all_to_hsb(h,s,next_bright,dur_secs)
 
             else:
                 kel = st.kelvin
                 if VERBOSE:
                     print 'setting next state {}: k:{} b:{} d:{}'.format(
                         st.name,kel,next_bright,dur_secs)
-                set_all_to_white(kel,next_bright,dur_secs)
+                set_all_to_bk(next_bright,kel,dur_secs)
             break
         else:
             prev_start = next_start
@@ -246,20 +269,20 @@ def put_request(c_s, duration):
 #        b = state['bright']
 #        if state.has_key('kelvin'):
 #            k = state['kelvin']
-#            set_all_to_white(k,b,duration)
+#            set_all_to_bk(b,k,duration)
 #        else:
 #            h = state['hue']
 #            s = state['sat']
-#            set_all_to_color(h,s,b,duration)
+#            set_all_to_hsb(h,s,b,duration)
 
-def set_all_to_white(kelvin,brightness,duration):
+def set_all_to_bk(brightness,kelvin,duration):
     if not lights_on:
         brightness = 0
     c_s = str('kelvin:'+str(kelvin)+
         ' brightness:'+str(brightness))
     put_request(c_s,duration)
 
-def set_all_to_color(hue,saturation,brightness,duration):
+def set_all_to_hsb(hue,saturation,brightness,duration):
     if not lights_on:
         brightness = 0
     c_s = str('hue:'+str(hue)+
@@ -326,7 +349,7 @@ def onExit():
 #time.sleep(1)
 #print 'BEFORE HUE 0>>>>>>>>>>>>>>>>>>>>>>>>>>>>>'
 #test_connection()
-#set_all_to_color(0,1.0,0.67,1.0)
+#set_all_to_hsb(0,1.0,0.67,1.0)
 #time.sleep(1)
 #print 'AFTER HUE 0>>>>>>>>>>>>>>>>>>>>>>>>>>>>>'
 #test_connection()
@@ -346,25 +369,22 @@ def onExit():
 #test_connection()
 
 #set_all_to_hsbk(0,1.0,0.5,2500,1.0)
-set_all_to_color(0,1.0,0.5,1.0)
-print 'starting long change'
-set_all_to_color(180,1.0,0.5,100)
-time.sleep(10)
-set_all_to_bright(0.0,1.0)
-time.sleep(10)
-set_all_to_bright(0.5,1.0)
-print 'all done'
 
-#set_all_to_hsbk(0,1.0,0.5,9000,0)
-#set_all_to_color(0,1.0,0.5,0)
+
+#set_all_to_hsbk(180,1.0,0.25,2500,0)
+#test_connection()
+#set_all_to_hsbk(0,1.0,0.25,2500,10)
+#test_connection()
+#set_all_to_hsbk(180,1.0,0.25,2500,10)
+#set_all_to_hsb(0,1.0,0.5,0)
 #time.sleep(1)
 #print 'BEFORE K9000>>>>>>>>>>>>>>>>>>>>>>>>>>>>>'
-#test_connection()
+test_connection()
 #set_all_to_hsbk(0,1.0,0.5,9000,10.0)
 #time.sleep(10)
 #print 'AFTER K9000>>>>>>>>>>>>>>>>>>>>>>>>>>>>>'
 #test_connection()
-#set_all_to_hsbk(0,1.0,0.67,9000,10.0)
+set_all_to_hsbk(0,1.0,0.67,9000,10.0)
 
 # HSB1->KB2 ... H=H, S->0, K=K, B1->B2
 
@@ -373,7 +393,7 @@ data = load_file()
 print 'HEADERS: ', lifx_api_creds.headers
 lut = build_lut(data)
 print 'LUT: ', lut
-#switch_on_from(lut)
+switch_on_from(lut)
 #switch_off()
 
 
