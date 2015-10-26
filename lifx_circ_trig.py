@@ -255,21 +255,6 @@ def put_request(c_s, duration):
          })
     r = requests.put(STATE_URL, data, headers=lifx_api_creds.headers)
     print (r)
-
-def set_all_to_bk(brightness,kelvin,duration):
-    if not lights_on:
-        brightness = 0
-    c_s = str('kelvin:'+str(kelvin)+
-        ' brightness:'+str(brightness))
-    put_request(c_s,duration)
-
-def set_all_to_hsb(hue,saturation,brightness,duration):
-    if not lights_on:
-        brightness = 0
-    c_s = str('hue:'+str(hue)+
-            ' saturation:'+str(saturation)+
-            ' brightness:'+str(brightness))
-    put_request(c_s,duration)
     
 def set_all_to_hsbk(hue,saturation,brightness,kelvin,duration):
     if not lights_on:
@@ -289,14 +274,6 @@ def set_all_to_hsbk(hue,saturation,brightness,kelvin,duration):
             ' kelvin:'+str(kelvin))
     put_request(c_s,duration)
 
-def set_all_to_bright(brightness,duration):
-    if not lights_on:
-        brightness = 0
-    c_s = str('brightness:'+str(brightness))
-    if VERBOSE:
-        print 'switching all to bright: {} dur: {}'.format(brightness, duration)
-    put_request(c_s,duration)
-
 def load_file():
     with open('data.json') as data_file:    
         return json.load(data_file)
@@ -306,11 +283,6 @@ def build_lut(data):
     states = data['states']
     lut = []
     for s in states:
-#        if s.has_key('hue'):
-#            ls = LightState(s['name'],s['bright'],s['start'],s['hue'],s['sat'])
-#        else:
-#            ls = LightState(s['name'],s['bright'],s['start'],
-#                            kelvin = s['kelvin'])
         ls = LightState(s['name'],s['bright'],s['start'],s['hue'],s['sat'],
                             kelvin = s['kelvin'])
         lut.append(ls)
@@ -338,15 +310,6 @@ def onExit():
 
 
 test_connection()
-#set_all_to_hsbk(0,1.0,0.5,9000,10.0)
-#time.sleep(10)
-#print 'AFTER K9000>>>>>>>>>>>>>>>>>>>>>>>>>>>>>'
-#test_connection()
-#set_all_to_hsbk(0,1.0,0.67,9000,10.0)
-
-# HSB1->KB2 ... H=H, S->0, K=K, B1->B2
-
-#switch_on()
 data = load_file()
 print 'HEADERS: ', lifx_api_creds.headers
 lut = build_lut(data)
