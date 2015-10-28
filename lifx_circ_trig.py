@@ -28,12 +28,6 @@ import lifx_api_creds
 #import tornado.httpserver
 #import tornado.ioloop
 
-VERBOSE = 1
-LIFX_URL = "https://api.lifx.com/v1/"
-STATE_URL = "https://api.lifx.com/v1/lights/all/state"
-SWITCH_OFF_FADEOUT = 3.0
-SWITCH_ON_FADEIN = 1.0
-
 lights_on = True
 
 class LightState():
@@ -179,7 +173,7 @@ def switch_on_from(lut):
 
             pv_st = lut[prev_index]
 
-            cond_print('currently in state: '+str(pv_st.name))
+            cond_print('currently in state:        '+str(pv_st.name))
             cond_print('current state start time:  ' + str(pv_st.start))
             cond_print('cur_time:                  '+str(cur_time))
             cond_print('next state start time:     ' + str(next_start))
@@ -300,20 +294,27 @@ def sort_lut(lut):
 
 def sun_events():
     o = ephem.Observer()
-    o.horizon = '-6' # civilian twilight
+    o.horizon = '-0:34' # navy almanac
     o.pressure= 0
     o.lat = str(DATA['lat'])
     o.long = str(DATA['long'])
     sun = ephem.Sun()
     sun.compute()
 
+    if DATA['extended-sunlight-mode']:
+        o.date = "2015-06-21 00:00:00"
+        print 'EXTENDED SUNLIGHT MODE'
+
     next_rising = o.next_rising(sun)
     next_rise_time = ephem.localtime(next_rising)
+    cond_print('next_rising:  ' + str(next_rise_time))
     next_noon_time = ephem.localtime(o.next_transit(sun, start=next_rising))
+    cond_print('next_noon: ' + str(next_noon_time))
     beg_twilight = ephem.localtime(o.previous_rising(ephem.Sun(),
                                                      use_center=True))
                                                      #Begin civil twilight
     next_set_time = ephem.localtime(o.next_setting(sun))
+    cond_print('next_setting: ' + str(next_set_time))
     # if extended-daylight, add time after sundown
     return next_rise_time, next_set_time, next_noon_time, beg_twilight
 
@@ -339,8 +340,22 @@ def sun_events():
 
 
 test_connection()
+
 DATA = load_file()
+VERBOSE = DATA['verbose']
+SWITCH_ON_FADEIN = DATA['switch_on_fadein']
+SWITCH_OFF_FADEOUT = DATA['switch_off_fadeout']
+LIFX_URL = DATA['LIFX_URL']
+STATE_URL = DATA['STATE_URL']
+
 LOC_LUT = sort_lut(localize_lut(build_lut(DATA)))
+
+
+
+
+#CONSIDER DOING A BREATHE EFFECT FOR EASE-IN EASE-OUT
+
+
 
 #print 'next sunrise: ', next_rise.time()
 
@@ -360,7 +375,4 @@ LOC_LUT = sort_lut(localize_lut(build_lut(DATA)))
 
 print 'LOC LUT: ', LOC_LUT
 switch_on_from(LOC_LUT)
-#switch_on_from(LUT)
-#set_all_to_hsbk(0,0,1.0,5000,1.0)
-#time.sleep(2)
-#set_all_to_hsbk(0,0.001,1.0,5000,1.0)
+
