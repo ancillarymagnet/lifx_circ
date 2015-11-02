@@ -350,8 +350,15 @@ STATE_URL = DATA['STATE_URL']
 
 LOC_LUT = sort_lut(localize_lut(build_lut(DATA)))
 
-
-
+while True:
+    try:
+        print 'checking'
+        switch_on_from(LOC_LUT)
+        # if current time > 
+        time.sleep(240)
+    except (KeyboardInterrupt, SystemExit):
+        print 'quitting'
+        raise
 
 #CONSIDER DOING A BREATHE EFFECT FOR EASE-IN EASE-OUT
 
