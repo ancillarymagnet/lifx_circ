@@ -10,14 +10,12 @@ def load_data():
     with open('user_data.json') as data_file:    
         return json.load(data_file)
         
-def generate_token():
+def read_token():
     return load_data()['token']
     
-def generate_headers():
+def read_headers():
     global token    
     return {"Authorization": "Bearer %s" % token}
     
-token = generate_token()
-print 'token generated: ', token
-headers = generate_headers()
-print 'headers generated: ', headers
+token = read_token()
+headers = read_headers()

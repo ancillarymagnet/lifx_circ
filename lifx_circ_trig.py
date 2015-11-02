@@ -6,7 +6,6 @@ Created on Fri Oct 16 08:36:28 2015
 
 TO DO:
 • HTTP SERVER / SWITCH
-• LOAD STATES / TOKEN / LAT / LONG FROM JSON FILE
 • AUTO - FIRE NEXT CUE
 • SUNRISE / SET RESET AT MIDNIGHT?
 """
@@ -14,13 +13,13 @@ TO DO:
 #from datetime import datetime, date, time
 import datetime
 import json
+import logging
+import logging.handlers
 from math import floor
-from pprint import pprint
-import pytz
 import requests
 import time
-import multiprocessing
-import subprocess
+#import multiprocessing
+#import subprocess
 
 import ephem
 import lifx_api_creds
@@ -29,6 +28,7 @@ import lifx_api_creds
 #import tornado.ioloop
 
 lights_on = True
+LOG_FILENAME = 'logs/lifx_circ_trig.log'
 
 class LightState():
     def __init__(self, name, bright, start,
@@ -86,29 +86,22 @@ class LightState():
 #    def check_origin(self, origin):
 #        return True
 
-def cond_print(print_string):
-    if VERBOSE:
-        print print_string
-
 def test_connection():
     response = requests.get('https://api.lifx.com/v1/lights/all',
                             headers=lifx_api_creds.headers)
     response_json = json.loads(response.text)
-    print 'TESTING.......'
-#    if VERBOSE:
-#        print response_json
-    print '-----------------'
+    logger.info('TESTING.......')
+    logger.info('-----------------')
     light_num = 0
     for r in response_json:
-        print('-------- LIGHT NUM: ' + str(light_num) + ' ---------')
-        print('-------- NAME: ' + str(r[u'label']) + ' --------')
-        print('-------- COLOR: ' + str(r[u'color']) + ' ---------')
-        print('-------- BRIGHT: ' + str(r[u'brightness']) + ' ---------')
-        #print r
-        print('-------- POWER:  ' + r[u'power'] + ' ---------')
-        print('///////////')
+        logger.info('-------- LIGHT NUM: ' + str(light_num) + ' ---------')
+        logger.info('-------- NAME: ' + str(r[u'label']) + ' --------')
+        logger.info('-------- COLOR: ' + str(r[u'color']) + ' ---------')
+        logger.info('-------- BRIGHT: ' + str(r[u'brightness']) + ' ---------')
+        logger.info('-------- POWER:  ' + r[u'power'] + ' ---------')
+        logger.info('///////////')
         light_num += 1
-    cond_print(response_json[1][u'power'])
+    logger.debug(response_json[1][u'power'])
 
 def day_frac_to_secs(day_frac):
     """ accepts TOD as fraction and returns seconds """
@@ -136,13 +129,12 @@ def secs_into_day():
     now = datetime.datetime.now().time()
     return ((now.hour * 60 * 60) + (now.minute * 60) + now.second)
 
-def print_time_from_day_frac(day_frac):
-    """ accepts TOD as fraction and prints and returns time string as h:m:s """
+def time_from_day_frac(day_frac):
+    """ accepts TOD as fraction and returns time string as h:m:s """
     secs = day_frac_to_secs(day_frac)
     c_hr, c_min, c_sec = secs_to_hr_min_sec(secs)
-    str_to_print = '{}:{}:{}'.format(c_hr, c_min, c_sec)
-    print str_to_print
-    return str_to_print
+    fmt_str = '{}:{}:{}'.format(c_hr, c_min, c_sec)
+    return fmt_str
 
 def datetime_to_day_frac(dt):
     hrs = dt.time().hour
@@ -155,8 +147,7 @@ def switch_on_from(lut):
     lights_on = True
 
     cur_time = secs_to_day_frac(secs_into_day())
-    if VERBOSE:
-        print_time_from_day_frac(cur_time)
+    logger.debug(time_from_day_frac(cur_time))
 
     for i, st in enumerate(lut):
         next_start = st.start
@@ -173,48 +164,48 @@ def switch_on_from(lut):
 
             pv_st = lut[prev_index]
 
-            cond_print('currently in state:        '+str(pv_st.name))
-            cond_print('current state start time:  ' + str(pv_st.start))
-            cond_print('cur_time:                  '+str(cur_time))
-            cond_print('next state start time:     ' + str(next_start))
+            logger.debug('currently in state:        '+str(pv_st.name))
+            logger.debug('current state start time:  ' + str(pv_st.start))
+            logger.debug('cur_time:                  '+str(cur_time))
+            logger.debug('next state start time:     ' + str(next_start))
 
             # calculate how far we are into the current state
             time_in = cur_time - pv_st.start
-            cond_print('abs time in to this state: ' + str(time_in))
+            logger.debug('abs time in to this state: ' + str(time_in))
 
             # calculate what percentage we are into the current state
             frac_in = time_in / (next_start - pv_st.start)
-            cond_print('frac in:                   ' + str(frac_in))
+            logger.debug('frac in:                   ' + str(frac_in))
 
             # calculate interpolated hue
             prev_hue = pv_st.hue
             next_hue = st.hue
             cur_hue = frac_in * (next_hue - prev_hue) + prev_hue
-            cond_print('cur_hue:                   ' + str(cur_hue))
+            logger.debug('cur_hue:                   ' + str(cur_hue))
 
             # calculate interpolated saturation
             prev_sat = pv_st.sat
             next_sat = st.sat
             cur_sat = frac_in * (next_sat - prev_sat) + prev_sat
-            cond_print('cur_sat:                   '+str(cur_sat))
+            logger.debug('cur_sat:                   '+str(cur_sat))
 
             # calculate interpolated brightness
             prev_bright = pv_st.bright
             next_bright = st.bright
             cur_bright = frac_in * (next_bright - prev_bright) + prev_bright
-            cond_print('cur_bright:                '+str(cur_bright))
+            logger.debug('cur_bright:                '+str(cur_bright))
 
             # calculate interpolated kelvin
             prev_kelvin = pv_st.kelvin
             next_kelvin = st.kelvin
             cur_kelvin = int(frac_in *
                              (next_kelvin - prev_kelvin) + prev_kelvin)
-            cond_print('cur_kelvin:                '+str(cur_kelvin))
+            logger.debug('cur_kelvin:                '+str(cur_kelvin))
 
             # calculate remaining duration in current state
             dur = next_start - cur_time
             dur_secs = day_frac_to_secs(dur)
-            cond_print('dur secs remaining:        ' + str(dur_secs))
+            logger.debug('dur secs remaining:        ' + str(dur_secs))
 
             # switch on at current pro-rated settings over 1s
             set_all_to_hsbk(cur_hue, cur_sat, cur_bright,
@@ -228,12 +219,12 @@ def switch_off():
     lights_on = False
     c_s = str('brightness:0.0')
     put_request(c_s, SWITCH_OFF_FADEOUT)
-    print('switching off')
+    logger.info('switching off')
 
 def put_request(c_s, duration):
     """ take a formatted color string and duration float
     and put that request to the LIFX API """
-    cond_print('put request: {}, {}'.format(c_s, duration))
+    logger.info('put request: {}, {}'.format(c_s, duration))
     data = json.dumps(
         {'selector':'all',
          'power':'on',
@@ -241,7 +232,7 @@ def put_request(c_s, duration):
          'duration':duration,
         })
     r = requests.put(STATE_URL, data, headers=lifx_api_creds.headers)
-    print (r)
+    logger.info(r)
 
 def set_all_to_hsbk(hue, saturation, brightness, kelvin, duration):
     if not lights_on:
@@ -264,7 +255,6 @@ def set_all_to_hsbk(hue, saturation, brightness, kelvin, duration):
 def load_file():
     with open('data.json') as data_file:
         return json.load(data_file)
-#    pprint(data)
 
 def build_lut(data):
     states = data['states']
@@ -303,18 +293,18 @@ def sun_events():
 
     if DATA['extended-sunlight-mode']:
         o.date = "2015-06-21 00:00:00"
-        print 'EXTENDED SUNLIGHT MODE'
+        logger.info('EXTENDED SUNLIGHT MODE')
 
     next_rising = o.next_rising(sun)
     next_rise_time = ephem.localtime(next_rising)
-    cond_print('next_rising:  ' + str(next_rise_time))
+    logger.debug('next_rising:  ' + str(next_rise_time))
     next_noon_time = ephem.localtime(o.next_transit(sun, start=next_rising))
-    cond_print('next_noon: ' + str(next_noon_time))
+    logger.debug('next_noon: ' + str(next_noon_time))
     beg_twilight = ephem.localtime(o.previous_rising(ephem.Sun(),
                                                      use_center=True))
                                                      #Begin civil twilight
     next_set_time = ephem.localtime(o.next_setting(sun))
-    cond_print('next_setting: ' + str(next_set_time))
+    logger.debug('next_setting: ' + str(next_set_time))
     # if extended-daylight, add time after sundown
     return next_rise_time, next_set_time, next_noon_time, beg_twilight
 
@@ -339,7 +329,34 @@ def sun_events():
 #    print 'IM BACK MUTHAFUCK: '
 
 
-test_connection()
+logger = logging.getLogger('lifx_circ_trig')
+logger.setLevel(logging.DEBUG)
+# create file handler which logs even debug messages
+fh = logging.handlers.RotatingFileHandler(
+                      LOG_FILENAME, maxBytes=50000, backupCount=5)
+fh.setLevel(logging.DEBUG)
+# create console handler with a higher log level
+ch = logging.StreamHandler()
+ch.setLevel(logging.ERROR)
+# create formatter and add it to the handlers
+formatter = logging.Formatter('%(asctime)s - %(name)s - %(levelname)s - %(message)s')
+ch.setFormatter(formatter)
+fh.setFormatter(formatter)
+# add the handlers to logger
+logger.addHandler(ch)
+logger.addHandler(fh)
+# define a Handler which writes INFO messages or higher to the sys.stderr
+console = logging.StreamHandler()
+console.setLevel(logging.INFO)
+# set a format which is simpler for console use
+formatter = logging.Formatter('%(name)-12s: %(levelname)-8s %(message)s')
+# tell the handler to use this format
+console.setFormatter(formatter)
+# add the handler to the root logger
+logging.getLogger('').addHandler(console)
+
+logger.info('<<<<<<<<<<<<<<<<<< SYSTEM RESTART >>>>>>>>>>>>>>>>>>>>>')
+
 
 DATA = load_file()
 VERBOSE = DATA['verbose']
@@ -350,36 +367,17 @@ STATE_URL = DATA['STATE_URL']
 
 LOC_LUT = sort_lut(localize_lut(build_lut(DATA)))
 
+test_connection()
+
 while True:
     try:
-        print 'checking'
         switch_on_from(LOC_LUT)
-        # if current time > 
         time.sleep(240)
     except (KeyboardInterrupt, SystemExit):
-        print 'quitting'
+        logger.info('quitting')
         raise
 
 #CONSIDER DOING A BREATHE EFFECT FOR EASE-IN EASE-OUT
 
 
-
-#print 'next sunrise: ', next_rise.time()
-
-#tz = pytz.timezone('US/Eastern')
-# 1. get correct date for the midnight using given timezone.
-#today = datetime.datetime.now(tz).date()
-# 2. get midnight in the correct timezone (taking into account DST)
-#NOTE: tzinfo=None and tz.localize()
-# assert that there is no dst transition at midnight (`is_dst=None`)
-#midnight = tz.localize(datetime.datetime.combine(today, time(0, 0)), is_dst=None)
-#print 'midnight: ', midnight
-#print next_set.timedelta(midnight).seconds()
-
-#today_length = next_rise - next_set
-
-#print( next_rise.timetuple().tm_hour )
-
-print 'LOC LUT: ', LOC_LUT
-switch_on_from(LOC_LUT)
 
