@@ -22,38 +22,39 @@ import time
 import ephem
 import creds
 from lightstate import LightState
-#import tornado.websocket
-#import tornado.httpserver
-#import tornado.ioloop
+import tornado.websocket
+import tornado.httpserver
+import tornado.ioloop
 
 LOG_FILENAME = 'logs/lifx_circ_trig.log'
+PORT = 7777
 
-#class IndexHandler(tornado.web.RequestHandler):
-#    """HTTP request handler to serve HTML for switch server"""
-#    def get(self):
-#        self.render('index.html')
-#
-#class SwitchWSHandler(tornado.websocket.WebSocketHandler):
-#    """Receives switch commands from the switch web view"""
-#    def open(self):
-#        print 'new connection'
-#        self.write_message('yo homie light server here')
-#
-#    def on_message(self, message):
-#        print 'SWITCH message received:  %s' % message
-#        self.write_message('got your query thanks homie')
-#        if message == 'ON':
-#            switch_on()
-#        elif message == 'OFF':
-#            switch_off()
-#        else:
-#            print('UNUSABLE MESSAGE FROM SWITCH')
-#
-#    def on_close(self):
-#        print 'connection closed'
-#
-#    def check_origin(self, origin):
-#        return True
+class IndexHandler(tornado.web.RequestHandler):
+    """HTTP request handler to serve HTML for switch server"""
+    def get(self):
+        self.render('switch/index.html')
+
+class SwitchWSHandler(tornado.websocket.WebSocketHandler):
+    """Receives switch commands from the switch web view"""
+    def open(self):
+        logger.info('new connection to switch')
+        self.write_message('yo homie light server here')
+
+    def on_message(self, message):
+        logger.info('SWITCH message received: {msg}'.format(msg=message))
+        self.write_message('got your switch thanks homie')
+        if message == 'ON' or message == 'on':
+            switch_on()
+        elif message == 'OFF' or message == 'off':
+            switch_off()
+        else:
+            logger.info('UNUSABLE MESSAGE FROM SWITCH')
+
+    def on_close(self):
+        logger.info('connection closed')
+
+    def check_origin(self, origin):
+        return True
 
 def test_connection():
     response = requests.get('https://api.lifx.com/v1/lights/all',
@@ -183,6 +184,12 @@ def switch_off():
     c_s = str('brightness:0.0')
     put_request(c_s, SWITCH_OFF_FADEOUT)
     logger.info('switching off')
+    
+def switch_on():
+    global lights_on
+    lights_on = True
+    update_from(LOC_LUT)
+    logger.info('switching on')
 
 def put_request(c_s, duration):
     """ take a formatted color string and duration float
@@ -284,21 +291,16 @@ def setup_logging():
     # create console handler with a higher log level
     ch = logging.StreamHandler()
     ch.setLevel(logging.ERROR)
-    # create formatter and add it to the handlers
     formatter = logging.Formatter('%(asctime)s - %(name)s - %(levelname)s - %(message)s')
     ch.setFormatter(formatter)
     fh.setFormatter(formatter)
-    # add the handlers to logger
     logger.addHandler(ch)
     logger.addHandler(fh)
     # define a Handler which writes INFO messages or higher to the sys.stderr
     console = logging.StreamHandler()
     console.setLevel(logging.INFO)
-    # set a format which is simpler for console use
     formatter = logging.Formatter('%(name)-12s: %(levelname)-8s %(message)s')
-    # tell the handler to use this format
     console.setFormatter(formatter)
-    # add the handler to the root logger
     logging.getLogger('').addHandler(console)    
     return logger
 
@@ -318,6 +320,18 @@ LOC_LUT = localize_and_sort(DATA)
 test_connection()
 
 lights_on = True
+
+application = tornado.web.Application(
+    handlers=[
+        (r"/", IndexHandler),
+        (r"/ws", SwitchWSHandler),
+    ])
+
+http_server = tornado.httpserver.HTTPServer(application)
+http_server.listen(PORT)
+logger.info('*** Server listening on port {port} ****'.format(port=PORT))
+
+tornado.ioloop.IOLoop.instance().start()
 
 while True:
     try:
