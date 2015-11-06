@@ -18,8 +18,6 @@ import logging.handlers
 from math import floor
 import requests
 import time
-#import multiprocessing
-#import subprocess
 
 import ephem
 import creds
@@ -30,8 +28,6 @@ from lightstate import LightState
 
 lights_on = True
 LOG_FILENAME = 'logs/lifx_circ_trig.log'
-
-
 
 #class IndexHandler(tornado.web.RequestHandler):
 #    """HTTP request handler to serve HTML for switch server"""
@@ -280,55 +276,38 @@ def sun_events():
     # if extended-daylight, add time after sundown
     return next_rise_time, next_set_time, next_noon_time, beg_twilight
 
-#def popenAndCall(onExit, popenArgs):
-#    """
-#    Runs the given args in a subprocess.Popen, and then calls the function
-#    onExit when the subprocess completes.
-#    onExit is a callable object, and popenArgs is a list/tuple of args that
-#    would give to subprocess.Popen.
-#    """
-#    def runInThread(onExit, popenArgs):
-#        proc = subprocess.Popen(*popenArgs)
-#        proc.wait()
-#        onExit()
-#        return
-#    process = multiprocessing.Process(target=runInThread, args=(onExit, popenArgs))
-#    process.start()
-#    # returns immediately after the thread starts
-#    return process
+def setup_logging():
+    logger = logging.getLogger('lifx_circ_trig')
+    logger.setLevel(logging.DEBUG)
+    # create file handler which logs even debug messages
+    fh = logging.handlers.RotatingFileHandler(
+                          LOG_FILENAME, maxBytes=50000, backupCount=5)
+    fh.setLevel(logging.DEBUG)
+    # create console handler with a higher log level
+    ch = logging.StreamHandler()
+    ch.setLevel(logging.ERROR)
+    # create formatter and add it to the handlers
+    formatter = logging.Formatter('%(asctime)s - %(name)s - %(levelname)s - %(message)s')
+    ch.setFormatter(formatter)
+    fh.setFormatter(formatter)
+    # add the handlers to logger
+    logger.addHandler(ch)
+    logger.addHandler(fh)
+    # define a Handler which writes INFO messages or higher to the sys.stderr
+    console = logging.StreamHandler()
+    console.setLevel(logging.INFO)
+    # set a format which is simpler for console use
+    formatter = logging.Formatter('%(name)-12s: %(levelname)-8s %(message)s')
+    # tell the handler to use this format
+    console.setFormatter(formatter)
+    # add the handler to the root logger
+    logging.getLogger('').addHandler(console)
+    
+    logger.info('<<<<<<<<<<<<<<<<<< SYSTEM RESTART >>>>>>>>>>>>>>>>>>>>>')
+    
+    return logger
 
-#def onExit():
-#    print 'IM BACK MUTHAFUCK: '
-
-
-logger = logging.getLogger('lifx_circ_trig')
-logger.setLevel(logging.DEBUG)
-# create file handler which logs even debug messages
-fh = logging.handlers.RotatingFileHandler(
-                      LOG_FILENAME, maxBytes=50000, backupCount=5)
-fh.setLevel(logging.DEBUG)
-# create console handler with a higher log level
-ch = logging.StreamHandler()
-ch.setLevel(logging.ERROR)
-# create formatter and add it to the handlers
-formatter = logging.Formatter('%(asctime)s - %(name)s - %(levelname)s - %(message)s')
-ch.setFormatter(formatter)
-fh.setFormatter(formatter)
-# add the handlers to logger
-logger.addHandler(ch)
-logger.addHandler(fh)
-# define a Handler which writes INFO messages or higher to the sys.stderr
-console = logging.StreamHandler()
-console.setLevel(logging.INFO)
-# set a format which is simpler for console use
-formatter = logging.Formatter('%(name)-12s: %(levelname)-8s %(message)s')
-# tell the handler to use this format
-console.setFormatter(formatter)
-# add the handler to the root logger
-logging.getLogger('').addHandler(console)
-
-logger.info('<<<<<<<<<<<<<<<<<< SYSTEM RESTART >>>>>>>>>>>>>>>>>>>>>')
-
+logger = setup_logging()
 
 DATA = load_file()
 VERBOSE = DATA['verbose']
