@@ -26,7 +26,6 @@ from lightstate import LightState
 #import tornado.httpserver
 #import tornado.ioloop
 
-lights_on = True
 LOG_FILENAME = 'logs/lifx_circ_trig.log'
 
 #class IndexHandler(tornado.web.RequestHandler):
@@ -113,7 +112,6 @@ def datetime_to_day_frac(dt):
     return secs_to_day_frac((hrs * 60 * 60) + (mins * 60) + secs)
 
 def update_from(lut):
-
     cur_time = secs_to_day_frac(secs_into_day())
     logger.debug(time_from_day_frac(cur_time))
 
@@ -301,13 +299,12 @@ def setup_logging():
     # tell the handler to use this format
     console.setFormatter(formatter)
     # add the handler to the root logger
-    logging.getLogger('').addHandler(console)
-    
-    logger.info('<<<<<<<<<<<<<<<<<< SYSTEM RESTART >>>>>>>>>>>>>>>>>>>>>')
-    
+    logging.getLogger('').addHandler(console)    
     return logger
 
+
 logger = setup_logging()
+logger.info('<<<<<<<<<<<<<<<<<< SYSTEM RESTART >>>>>>>>>>>>>>>>>>>>>')
 
 DATA = load_file()
 VERBOSE = DATA['verbose']
