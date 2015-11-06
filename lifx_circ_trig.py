@@ -22,7 +22,7 @@ import time
 #import subprocess
 
 import ephem
-import lifx_api_creds
+import creds
 #import tornado.websocket
 #import tornado.httpserver
 #import tornado.ioloop
@@ -88,7 +88,7 @@ class LightState():
 
 def test_connection():
     response = requests.get('https://api.lifx.com/v1/lights/all',
-                            headers=lifx_api_creds.headers)
+                            headers=creds.headers)
     response_json = json.loads(response.text)
     logger.info('TESTING.......')
     logger.info('-----------------')
@@ -143,8 +143,6 @@ def datetime_to_day_frac(dt):
     return secs_to_day_frac((hrs * 60 * 60) + (mins * 60) + secs)
 
 def update_from(lut):
-    global lights_on
-    lights_on = True
 
     cur_time = secs_to_day_frac(secs_into_day())
     logger.debug(time_from_day_frac(cur_time))
@@ -186,8 +184,13 @@ def update_from(lut):
             logger.debug('cur_sat:                   '+str(cur_sat))
 
             # calculate interpolated brightness
-            cur_bright = frac_in * (st.bright - pv_st.bright) + pv_st.bright
-            logger.debug('cur_bright:                '+str(cur_bright))
+            if lights_on:
+                cur_bright = frac_in * (st.bright - pv_st.bright) + pv_st.bright
+                logger.debug('cur_bright:                '+str(cur_bright))
+                next_bright = st.bright
+            else:
+                cur_bright = 0.0
+                next_bright = 0.0
 
             # calculate interpolated kelvin
             cur_kelvin = int(frac_in *
@@ -203,7 +206,7 @@ def update_from(lut):
             set_all_to_hsbk(cur_hue, cur_sat, cur_bright,
                             cur_kelvin, SWITCH_ON_FADEIN)
             time.sleep(SWITCH_ON_FADEIN)
-            set_all_to_hsbk(st.hue, st.sat, st.bright, st.kelvin, dur_secs)
+            set_all_to_hsbk(st.hue, st.sat, next_bright, st.kelvin, dur_secs)
             break
 
 def switch_off():
@@ -223,7 +226,7 @@ def put_request(c_s, duration):
          'color':c_s,
          'duration':duration,
         })
-    r = requests.put(STATE_URL, data, headers=lifx_api_creds.headers)
+    r = requests.put(STATE_URL, data, headers=creds.headers)
     logger.info(r)
 
 def set_all_to_hsbk(hue, saturation, brightness, kelvin, duration):
@@ -273,6 +276,9 @@ def localize_lut(lut):
 
 def sort_lut(lut):
     return sorted(lut, key=lambda st: st.start)
+    
+def localize_and_sort(lut):
+    return sort_lut(localize_lut(build_lut(lut)))
 
 def sun_events():
     o = ephem.Observer()
@@ -357,9 +363,11 @@ SWITCH_OFF_FADEOUT = DATA['switch_off_fadeout']
 LIFX_URL = DATA['LIFX_URL']
 STATE_URL = DATA['STATE_URL']
 
-LOC_LUT = sort_lut(localize_lut(build_lut(DATA)))
+LOC_LUT = localize_and_sort(DATA)
 
 test_connection()
+
+lights_on = True
 
 while True:
     try:
