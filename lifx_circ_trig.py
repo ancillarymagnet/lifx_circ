@@ -178,28 +178,20 @@ def switch_on_from(lut):
             logger.debug('frac in:                   ' + str(frac_in))
 
             # calculate interpolated hue
-            prev_hue = pv_st.hue
-            next_hue = st.hue
-            cur_hue = frac_in * (next_hue - prev_hue) + prev_hue
+            cur_hue = frac_in * (st.hue - pv_st.hue) + pv_st.hue
             logger.debug('cur_hue:                   ' + str(cur_hue))
 
             # calculate interpolated saturation
-            prev_sat = pv_st.sat
-            next_sat = st.sat
-            cur_sat = frac_in * (next_sat - prev_sat) + prev_sat
+            cur_sat = frac_in * (st.sat - pv_st.sat) + pv_st.sat
             logger.debug('cur_sat:                   '+str(cur_sat))
 
             # calculate interpolated brightness
-            prev_bright = pv_st.bright
-            next_bright = st.bright
-            cur_bright = frac_in * (next_bright - prev_bright) + prev_bright
+            cur_bright = frac_in * (st.bright - pv_st.bright) + pv_st.bright
             logger.debug('cur_bright:                '+str(cur_bright))
 
             # calculate interpolated kelvin
-            prev_kelvin = pv_st.kelvin
-            next_kelvin = st.kelvin
             cur_kelvin = int(frac_in *
-                             (next_kelvin - prev_kelvin) + prev_kelvin)
+                             (st.kelvin - pv_st.kelvin) + pv_st.kelvin)
             logger.debug('cur_kelvin:                '+str(cur_kelvin))
 
             # calculate remaining duration in current state
