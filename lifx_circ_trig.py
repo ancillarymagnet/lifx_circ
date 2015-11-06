@@ -142,7 +142,7 @@ def datetime_to_day_frac(dt):
     secs = dt.time().second
     return secs_to_day_frac((hrs * 60 * 60) + (mins * 60) + secs)
 
-def switch_on_from(lut):
+def update_from(lut):
     global lights_on
     lights_on = True
 
@@ -363,7 +363,7 @@ test_connection()
 
 while True:
     try:
-        switch_on_from(LOC_LUT)
+        update_from(LOC_LUT)
         time.sleep(240)
     except (KeyboardInterrupt, SystemExit):
         logger.info('quitting')
