@@ -4,19 +4,32 @@ NOAH NORMAN // ANCILLARY MAGNET, LLC
 n@hardwork.party -->
 <html>
   <head>
-    <title>SWITCH IT</title>
     <meta charset="utf-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+    
+    <title>SWITCH IT</title>
+
     <style type="text/css">
       body {
         text-align: center;
         min-width: 500px;
       }
+      .controls{
+        padding-top: 10%;
+      }
     </style>
+
     <script src="http://code.jquery.com/jquery.min.js"></script>
+    <!-- bootstrap toggle -->
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.5/css/bootstrap.min.css" integrity="sha512-dTfge/zgoMYpP7QbHy4gWMEGsbsdZeCXz7irItjcC3sPUFtf0kuFbDz/ixG7ArTxmDjLXDmezHubeNikyKGVyQ==" crossorigin="anonymous">
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.5/js/bootstrap.min.js" integrity="sha512-K1qjQ+NcF2TYO/eI3M6v8EiNYZfA95pQumfvcVrTHtwQVDG+aHRqLi/ETn2uB+1JqwYqVG3LIvdm9lj6imS/pQ==" crossorigin="anonymous"></script>
+    <link href="https://gitcdn.github.io/bootstrap-toggle/2.2.0/css/bootstrap-toggle.min.css" rel="stylesheet">
+    <script src="https://gitcdn.github.io/bootstrap-toggle/2.2.0/js/bootstrap-toggle.min.js"></script>
+
     <script>
- 
       $(document).ready(function () {
-        $("div#message_details").hide()
+        $("div#controls").hide()
         $("#warning").show()
  
         var ws;
@@ -25,13 +38,17 @@ n@hardwork.party -->
         var PORT = 7777;
         var URI = '/ws';
 
+        var override = false;
+        var uiUpdate = true;
+
         // create websocket instance
         ws = new WebSocket("ws://" + HOST + ":" + PORT + URI);
 
         // Handle incoming websocket message callback
         ws.onmessage = function(evt) {
-          console.log("Message Received: " + evt.data)
-          //alert("message received: " + evt.data);
+          console.log("Message Received: " + evt.data);
+          var obj = jQuery.parseJSON( evt.data );
+          updatePowerUI(obj.power_on);
           };
 
         // Close Websocket callback
@@ -43,7 +60,7 @@ n@hardwork.party -->
         // Open Websocket callback
         ws.onopen = function(evt) { 
           $("#warning").hide();
-          $("div#message_details").show();
+          $("div#controls").show();
           console.log("***Connection Opened***");
         };
 
@@ -52,6 +69,47 @@ n@hardwork.party -->
             console.log("Sending Message: "+$("#message").val());
             ws.send($("#message").val());
         });
+
+        function updatePowerUI(pwr){
+          uiUpdate = true;
+          if (pwr == "True") { 
+           togglePwrOn();
+          } else if (pwr == "False") {
+           togglePwrOff();
+          }
+        }
+
+        function togglePwrOn() {
+          $('#powertoggle').bootstrapToggle('on');
+        }
+        function togglePwrOff() {
+          $('#powertoggle').bootstrapToggle('off');
+        }
+
+        $(function() {
+          $('#powertoggle').change(function() {
+            if($(this).prop('checked')){
+              // switch on event
+              if( !uiUpdate ){
+                ws.send("on");
+                console.log("UI update and msg to server: on");
+              } else {
+                console.log("UI Update Only: on");
+                uiUpdate = false;
+              }
+            } else {
+              // switch off event
+              if( !uiUpdate ){
+                ws.send("off");
+                console.log("UI update and msg to server: off");
+              } else {
+                console.log("UI Update Only: off");
+                uiUpdate = false;
+              }
+            }
+          });
+        });
+
       });
 
 
@@ -59,13 +117,15 @@ n@hardwork.party -->
   </head>
  
   <body>
+    <div class="container-fluid">
     <div id="warning">SERVER NOT FOUND. LAUNCH SERVER and RELOAD OR ELSE NO SWITCH.</div>
-    <div id="message_details">
-        </br></br>
-        <label for="message">SWITCH:</label>
-        <input type="text" id="message" value="off"/><br />
-        <input type="submit" id="send" value="SEND" />
+    <div id="controls" style="padding-top: 5%;">
+    <input type="checkbox" data-toggle="toggle" id="powertoggle" data-on="ON" data-off="OFF" data-width="70%" data-height="300" data-onstyle="success" data-offstyle="danger">
     </div>
+<script>
+
+</script>    
+</div> <!-- /container -->
 
   </body>
 </html>

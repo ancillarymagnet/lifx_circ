@@ -27,7 +27,9 @@ import tornado.httpserver
 import tornado.ioloop
 
 LOG_FILENAME = 'logs/lifx_circ_trig.log'
+ALL_API_URL = 'https://api.lifx.com/v1/lights/all'
 PORT = 7777
+CONTROLLERS = []
 
 class IndexHandler(tornado.web.RequestHandler):
     """HTTP request handler to serve HTML for switch server"""
@@ -35,31 +37,34 @@ class IndexHandler(tornado.web.RequestHandler):
         self.render('switch/index.html')
 
 class SwitchWSHandler(tornado.websocket.WebSocketHandler):
-    """Receives switch commands from the switch web view"""
+    """Communicates switch commands with the switch web view"""
     def open(self):
-        logger.info('new connection to switch')
-        self.write_message('yo homie light server here')
+        logger.info('new connection to switch, sending power state')
+        msg = controller_pwr_msg()
+        self.write_message(msg)
+        CONTROLLERS.append(self)
 
     def on_message(self, message):
         logger.info('SWITCH message received: {msg}'.format(msg=message))
-        self.write_message('got your switch thanks homie')
         if message == 'ON' or message == 'on':
-            switch_on()
+            switch_on(True)
         elif message == 'OFF' or message == 'off':
-            switch_off()
+            switch_off(True)
         else:
             logger.info('UNUSABLE MESSAGE FROM SWITCH')
 
     def on_close(self):
         logger.info('connection closed')
+        CONTROLLERS.remove(self)
 
     def check_origin(self, origin):
         return True
 
+def controller_pwr_msg():
+    return "{ \"power_on\": \"%s\" }" % (lights_on)
+
 def test_connection():
-    response = requests.get('https://api.lifx.com/v1/lights/all',
-                            headers=creds.headers)
-    response_json = json.loads(response.text)
+    response_json = get_states()
     logger.info('TESTING.......')
     logger.info('-----------------')
     light_num = 0
@@ -71,7 +76,23 @@ def test_connection():
         logger.info('-------- POWER:  ' + r[u'power'] + ' ---------')
         logger.info('///////////')
         light_num += 1
-    logger.debug(response_json[1][u'power'])
+    logger.debug(power_state())
+
+def get_states():
+    response = requests.get(ALL_API_URL,
+                            headers=creds.headers)
+    return json.loads(response.text)
+
+def power_state():
+    response_json = get_states()
+    return response_json[1][u'power']
+    
+def update_lights_on():
+    global lights_on    
+    if power_state() == "on":
+        lights_on = True
+    else:
+        lights_on = False
 
 def day_frac_to_secs(day_frac):
     """ accepts TOD as fraction and returns seconds """
@@ -178,18 +199,30 @@ def update_from(lut):
             set_all_to_hsbk(st.hue, st.sat, next_bright, st.kelvin, dur_secs)
             break
 
-def switch_off():
+def update_controller_pwr_states():
+    for c in CONTROLLERS:
+        c.write_message(controller_pwr_msg())
+
+def switch_off(from_controller):
     global lights_on
     lights_on = False
     c_s = str('brightness:0.0')
     put_request(c_s, SWITCH_OFF_FADEOUT)
-    logger.info('switching off')
+    if from_controller:  
+        logger.info('received power switch from controller, switching off')
+    else:
+        logger.info('notifying controller of power state switch off')
+        update_controller_pwr_states()
     
-def switch_on():
+def switch_on(from_controller):
     global lights_on
     lights_on = True
     update_from(LOC_LUT)
-    logger.info('switching on')
+    if from_controller:  
+        logger.info('received power switch from controller, switching on')
+    else:
+        logger.info('notifying controller of power state switch on')
+        update_controller_pwr_states()
 
 def put_request(c_s, duration):
     """ take a formatted color string and duration float
@@ -281,7 +314,7 @@ def sun_events():
     # if extended-daylight, add time after sundown
     return next_rise_time, next_set_time, next_noon_time, beg_twilight
 
-def setup_logging():
+def make_logger():
     logger = logging.getLogger('lifx_circ_trig')
     logger.setLevel(logging.DEBUG)
     # create file handler which logs even debug messages
@@ -305,7 +338,7 @@ def setup_logging():
     return logger
 
 
-logger = setup_logging()
+logger = make_logger()
 logger.info('<<<<<<<<<<<<<<<<<< SYSTEM RESTART >>>>>>>>>>>>>>>>>>>>>')
 
 DATA = load_file()
@@ -318,8 +351,7 @@ STATE_URL = DATA['STATE_URL']
 LOC_LUT = localize_and_sort(DATA)
 
 test_connection()
-
-lights_on = True
+update_lights_on()
 
 application = tornado.web.Application(
     handlers=[
@@ -335,6 +367,7 @@ tornado.ioloop.IOLoop.instance().start()
 
 while True:
     try:
+        print('mainloop')
         update_from(LOC_LUT)
         time.sleep(240)
     except (KeyboardInterrupt, SystemExit):
