@@ -23,8 +23,6 @@ import tornado.ioloop
 import config
 import creds
 import convert
-from lightstate import LightState
-
 
 LOG_FILENAME = 'logs/lifx_circ_trig.log'
 ALL_API_URL = 'https://api.lifx.com/v1/lights/all'
@@ -39,22 +37,22 @@ class IndexHandler(tornado.web.RequestHandler):
 class SwitchWSHandler(tornado.websocket.WebSocketHandler):
     """Communicates switch commands with the switch web view"""
     def open(self):
-        logger.info('new connection to switch, sending power state')
+        inf('new connection to switch, sending power state')
         msg = controller_pwr_msg()
         self.write_message(msg)
         CONTROLLERS.append(self)
 
     def on_message(self, message):
-        logger.info('SWITCH message received: {msg}'.format(msg=message))
+        inf('SWITCH message received: {msg}'.format(msg=message))
         if message == 'ON' or message == 'on':
             switch_on(True)
         elif message == 'OFF' or message == 'off':
             switch_off(True)
         else:
-            logger.info('UNUSABLE MESSAGE FROM SWITCH')
+            inf('UNUSABLE MESSAGE FROM SWITCH')
 
     def on_close(self):
-        logger.info('connection closed')
+        inf('connection closed')
         CONTROLLERS.remove(self)
 
     def check_origin(self, origin):
@@ -69,18 +67,18 @@ def update_controller_pwr_states():
 
 def test_connection():
     response_json = get_states()
-    logger.info('TESTING.......')
-    logger.info('-----------------')
+    inf('TESTING.......')
+    inf('-----------------')
     light_num = 0
     for r in response_json:
-        logger.info('-------- LIGHT NUM: ' + str(light_num) + ' ---------')
-        logger.info('-------- NAME: ' + str(r[u'label']) + ' --------')
-        logger.info('-------- COLOR: ' + str(r[u'color']) + ' ---------')
-        logger.info('-------- BRIGHT: ' + str(r[u'brightness']) + ' ---------')
-        logger.info('-------- POWER:  ' + r[u'power'] + ' ---------')
-        logger.info('///////////')
+        inf('-------- LIGHT NUM: ' + str(light_num) + ' ---------')
+        inf('-------- NAME: ' + str(r[u'label']) + ' --------')
+        inf('-------- COLOR: ' + str(r[u'color']) + ' ---------')
+        inf('-------- BRIGHT: ' + str(r[u'brightness']) + ' ---------')
+        inf('-------- POWER:  ' + r[u'power'] + ' ---------')
+        inf('///////////')
         light_num += 1
-    logger.debug(power_state())
+    dbg(power_state())
 
 def get_states():
     response = requests.get(ALL_API_URL,
@@ -98,9 +96,18 @@ def update_lights_on():
     else:
         lights_on = False
 
+def interp(start, end, frac):
+    return frac * (end - start) + start
+
+def inf(str):
+    logger.info(str)
+    
+def dbg(str):
+    logger.debug(str)
+
 def update_from(lut):
     cur_time = convert.secs_to_day_frac(convert.secs_into_day())
-    logger.debug(convert.time_from_day_frac(cur_time))
+    dbg(convert.time_from_day_frac(cur_time))
 
     for i, st in enumerate(lut):
         next_start = st.start
@@ -117,45 +124,41 @@ def update_from(lut):
 
             pv_st = lut[prev_index]
 
-            logger.debug('currently in state:        '+str(pv_st.name))
-            logger.debug('current state start time:  ' + str(pv_st.start))
-            logger.debug('cur_time:                  '+str(cur_time))
-            logger.debug('next state start time:     ' + str(next_start))
+            dbg('currently in state:        '+str(pv_st.name))
+            dbg('current state start time:  ' + str(pv_st.start))
+            dbg('cur_time:                  '+str(cur_time))
+            dbg('next state:                ' + str(st.name))
+            dbg('next state start time:     ' + str(next_start))
 
             # calculate how far we are into the current state
             time_in = cur_time - pv_st.start
-            logger.debug('abs time in to this state: ' + str(time_in))
+            dbg('abs time in to this state: ' + str(time_in))
 
             # calculate what percentage we are into the current state
             frac_in = time_in / (next_start - pv_st.start)
-            logger.debug('frac in:                   ' + str(frac_in))
+            dbg('frac in:                   ' + str(frac_in))
 
-            # calculate interpolated hue
-            cur_hue = frac_in * (st.hue - pv_st.hue) + pv_st.hue
-            logger.debug('cur_hue:                   ' + str(cur_hue))
+            cur_hue = interp(pv_st.hue, st.hue, frac_in)
+            dbg('cur_hue:                   ' + str(cur_hue))
 
-            # calculate interpolated saturation
-            cur_sat = frac_in * (st.sat - pv_st.sat) + pv_st.sat
-            logger.debug('cur_sat:                   '+str(cur_sat))
+            cur_sat = interp(pv_st.sat, st.sat, frac_in)
+            dbg('cur_sat:                   '+str(cur_sat))
 
-            # calculate interpolated brightness
             if lights_on:
-                cur_bright = frac_in * (st.bright - pv_st.bright) + pv_st.bright
-                logger.debug('cur_bright:                '+str(cur_bright))
+                cur_bright = interp(pv_st.bright, st.bright, frac_in)
                 next_bright = st.bright
             else:
                 cur_bright = 0.0
                 next_bright = 0.0
+            dbg('cur_bright:                '+str(cur_bright))
 
-            # calculate interpolated kelvin
-            cur_kelvin = int(frac_in *
-                             (st.kelvin - pv_st.kelvin) + pv_st.kelvin)
-            logger.debug('cur_kelvin:                '+str(cur_kelvin))
+            cur_kelvin = int(interp(pv_st.kelvin, st.kelvin, frac_in))
+            dbg('cur_kelvin:                '+str(cur_kelvin))
 
             # calculate remaining duration in current state
             dur = next_start - cur_time
             dur_secs = convert.day_frac_to_secs(dur)
-            logger.debug('dur secs remaining:        ' + str(dur_secs))
+            dbg('dur secs remaining:        ' + str(dur_secs))
 
             # switch on at current pro-rated settings over 1s
             set_all_to_hsbk(cur_hue, cur_sat, cur_bright,
@@ -168,27 +171,27 @@ def switch_off(from_controller):
     global lights_on
     lights_on = False
     c_s = str('brightness:0.0')
-    put_request(c_s, config.fade_out())
     if from_controller:  
-        logger.info('received power switch from controller, switching off')
+        inf('received power switch from controller, switching off')
     else:
-        logger.info('notifying controller of power state switch off')
+        inf('notifying controller of power state switch off')
         update_controller_pwr_states()
+    put_request(c_s, config.fade_out())
     
 def switch_on(from_controller):
     global lights_on
     lights_on = True
-    update_from(LOC_LUT)
     if from_controller:  
-        logger.info('received power switch from controller, switching on')
+        inf('received power switch from controller, switching on')
     else:
-        logger.info('notifying controller of power state switch on')
+        inf('notifying controller of power state switch on')
         update_controller_pwr_states()
+    update_from(config.LOC_LUT)
 
 def put_request(c_s, duration):
     """ take a formatted color string and duration float
     and put that request to the LIFX API """
-    logger.info('put request: {}, {}'.format(c_s, duration))
+    inf('put request: {}, {}'.format(c_s, duration))
     data = json.dumps(
         {'selector':'all',
          'power':'on',
@@ -196,7 +199,7 @@ def put_request(c_s, duration):
          'duration':duration,
         })
     r = requests.put(config.state_url(), data, headers=creds.headers)
-    logger.info(r)
+    inf(r)
 
 def set_all_to_hsbk(hue, saturation, brightness, kelvin, duration):
     if not lights_on:
@@ -241,10 +244,9 @@ def make_logger():
 
 
 logger = make_logger()
-logger.info('<<<<<<<<<<<<<<<<<< SYSTEM RESTART >>>>>>>>>>>>>>>>>>>>>')
+inf('<<<<<<<<<<<<<<<<<< SYSTEM RESTART >>>>>>>>>>>>>>>>>>>>>')
 
 config.init()
-LOC_LUT = config.LOC_LUT
 
 test_connection()
 update_lights_on()
@@ -257,17 +259,17 @@ application = tornado.web.Application(
 
 http_server = tornado.httpserver.HTTPServer(application)
 http_server.listen(PORT)
-logger.info('*** Server listening on port {port} ****'.format(port=PORT))
+inf('*** Server listening on port {port} ****'.format(port=PORT))
 
 tornado.ioloop.IOLoop.instance().start()
 
 while True:
     try:
         print('mainloop')
-        update_from(LOC_LUT)
+        update_from(config.LOC_LUT)
         time.sleep(240)
     except (KeyboardInterrupt, SystemExit):
-        logger.info('quitting')
+        inf('quitting')
         raise
 
 #CONSIDER DOING A BREATHE EFFECT FOR EASE-IN EASE-OUT
