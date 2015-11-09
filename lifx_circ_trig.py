@@ -5,7 +5,7 @@ Created on Fri Oct 16 08:36:28 2015
 @author: handsheik
 
 TO DO:
-• HTTP SERVER / SWITCH
+• HTTP BYPASS SWITCH
 • AUTO - FIRE NEXT CUE
 • SUNRISE / SET RESET AT MIDNIGHT?
 """
@@ -63,6 +63,12 @@ def update_controller_pwr_states():
     for c in CONTROLLERS:
         c.write_message(controller_pwr_msg())
 
+def inf(str):
+    logger.info(str)
+    
+def dbg(str):
+    logger.debug(str)
+
 def test_connection():
     response_json = get_states()
     inf('TESTING.......')
@@ -78,15 +84,18 @@ def test_connection():
         light_num += 1
     dbg(power_state())
 
-def get_states():
-    response = requests.get(ALL_API_URL,
-                            headers=creds.headers)
-    return json.loads(response.text)
-
 def power_state():
     response_json = get_states()
     return response_json[1][u'power']
     
+def get_states():
+    response = requests.get(ALL_API_URL,
+                            headers=creds.headers)
+    return json.loads(response.text)
+    
+def interp(start, end, frac):
+    return frac * (end - start) + start
+
 def update_lights_on():
     global lights_on    
     if power_state() == "on":
@@ -94,14 +103,26 @@ def update_lights_on():
     else:
         lights_on = False
 
-def interp(start, end, frac):
-    return frac * (end - start) + start
-
-def inf(str):
-    logger.info(str)
+def switch_off(from_controller):
+    global lights_on
+    lights_on = False
+    c_s = str('brightness:0.0')
+    if from_controller:  
+        inf('received power switch from controller, switching off')
+    else:
+        inf('notifying controller of power state switch off')
+        update_controller_pwr_states()
+    put_request(c_s, config.fade_out())
     
-def dbg(str):
-    logger.debug(str)
+def switch_on(from_controller):
+    global lights_on
+    lights_on = True
+    if from_controller:  
+        inf('received power switch from controller, switching on')
+    else:
+        inf('notifying controller of power state switch on')
+        update_controller_pwr_states()
+    update_from(config.LOC_LUT)
 
 def update_from(lut):
     cur_time = convert.secs_to_day_frac(convert.secs_into_day())
@@ -165,40 +186,6 @@ def update_from(lut):
             set_all_to_hsbk(st.hue, st.sat, next_bright, st.kelvin, dur_secs)
             break
 
-def switch_off(from_controller):
-    global lights_on
-    lights_on = False
-    c_s = str('brightness:0.0')
-    if from_controller:  
-        inf('received power switch from controller, switching off')
-    else:
-        inf('notifying controller of power state switch off')
-        update_controller_pwr_states()
-    put_request(c_s, config.fade_out())
-    
-def switch_on(from_controller):
-    global lights_on
-    lights_on = True
-    if from_controller:  
-        inf('received power switch from controller, switching on')
-    else:
-        inf('notifying controller of power state switch on')
-        update_controller_pwr_states()
-    update_from(config.LOC_LUT)
-
-def put_request(c_s, duration):
-    """ take a formatted color string and duration float
-    and put that request to the LIFX API """
-    inf('put request: {}, {}'.format(c_s, duration))
-    data = json.dumps(
-        {'selector':'all',
-         'power':'on',
-         'color':c_s,
-         'duration':duration,
-        })
-    r = requests.put(config.state_url(), data, headers=creds.headers)
-    inf(r)
-
 def set_all_to_hsbk(hue, saturation, brightness, kelvin, duration):
     if not lights_on:
         brightness = 0
@@ -217,13 +204,24 @@ def set_all_to_hsbk(hue, saturation, brightness, kelvin, duration):
                   ' kelvin:'+str(kelvin))
     put_request(c_s, duration)
 
+def put_request(c_s, duration):
+    """ take a formatted color string and duration float
+    and put that request to the LIFX API """
+    inf('put request: {}, {}'.format(c_s, duration))
+    data = json.dumps(
+        {'selector':'all',
+         'power':'on',
+         'color':c_s,
+         'duration':duration,
+        })
+    r = requests.put(config.state_url(), data, headers=creds.headers)
+    inf(r)
 
 
 logger = log.make_logger()
 inf('<<<<<<<<<<<<<<<<<< SYSTEM RESTART >>>>>>>>>>>>>>>>>>>>>')
 
 config.init()
-
 test_connection()
 update_lights_on()
 
