@@ -11,12 +11,26 @@ n@hardwork.party -->
     <title>SWITCH IT</title>
 
     <style type="text/css">
+      html{
+        height: 100%;
+      }
       body {
+        height: 100%;
         text-align: center;
         min-width: 500px;
+        background-color: black;
       }
       .controls{
         padding-top: 10%;
+      }
+      .fill-height {
+        min-height: 100%;
+        height:auto !important; /* cross-browser */
+        height: 100%; /* cross-browser */
+      }
+      .container-fluid {
+        height: 100%;
+        overflow-y: hidden; /* don't show content that exceeds my height */
       }
     </style>
 
@@ -117,15 +131,11 @@ n@hardwork.party -->
   </head>
  
   <body>
-    <div class="container-fluid">
-    <div id="warning">SERVER NOT FOUND. LAUNCH SERVER and RELOAD OR ELSE NO SWITCH.</div>
-    <div id="controls" style="padding-top: 5%;">
-    <input type="checkbox" data-toggle="toggle" id="powertoggle" data-on="ON" data-off="OFF" data-width="70%" data-height="300" data-onstyle="success" data-offstyle="danger">
-    </div>
-<script>
-
-</script>    
-</div> <!-- /container -->
-
+    <div class="container-fluid fill-height" style="background-color: black;">
+      <div id="warning">SERVER NOT FOUND. LAUNCH SERVER and RELOAD OR ELSE NO SWITCH.</div>
+      <div id="controls" style="padding-top: 5%;">
+      <input type="checkbox" data-toggle="toggle" id="powertoggle" data-on="ON" data-off="OFF" data-width="70%" data-height="300" data-onstyle="success" data-offstyle="danger">
+      </div>  
+    </div> <!-- /container -->
   </body>
 </html>
