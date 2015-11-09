@@ -10,21 +10,21 @@ TO DO:
 • SUNRISE / SET RESET AT MIDNIGHT?
 """
 
-#from datetime import datetime, date, time
-import datetime
 import json
 import logging
 import logging.handlers
-from math import floor
 import requests
 import time
 
-import ephem
-import creds
-from lightstate import LightState
 import tornado.websocket
 import tornado.httpserver
 import tornado.ioloop
+
+import config
+import creds
+import convert
+from lightstate import LightState
+
 
 LOG_FILENAME = 'logs/lifx_circ_trig.log'
 ALL_API_URL = 'https://api.lifx.com/v1/lights/all'
@@ -62,6 +62,10 @@ class SwitchWSHandler(tornado.websocket.WebSocketHandler):
 
 def controller_pwr_msg():
     return "{ \"power_on\": \"%s\" }" % (lights_on)
+    
+def update_controller_pwr_states():
+    for c in CONTROLLERS:
+        c.write_message(controller_pwr_msg())
 
 def test_connection():
     response_json = get_states()
@@ -94,48 +98,9 @@ def update_lights_on():
     else:
         lights_on = False
 
-def day_frac_to_secs(day_frac):
-    """ accepts TOD as fraction and returns seconds """
-    return float(day_frac) * 86400
-
-def secs_to_day_frac(secs):
-    """ accepts seconds and returns TOD as fraction """
-    if secs:
-        return float(secs) / 86400
-    else:
-        return 0
-
-def secs_to_hr_min_sec(secs):
-    """ accepts seconds and returns (h,m,s) tuple """
-    if secs:
-        hrs = int(floor(secs / 60 / 60))
-        mins = int(floor(secs / 60 % 60))
-        secs = int(floor(secs % 60))
-        return (hrs, mins, secs)
-    else:
-        return (0, 0, 0)
-
-def secs_into_day():
-    """ returns the number of seconds since midnight """
-    now = datetime.datetime.now().time()
-    return ((now.hour * 60 * 60) + (now.minute * 60) + now.second)
-
-def time_from_day_frac(day_frac):
-    """ accepts TOD as fraction and returns time string as h:m:s """
-    secs = day_frac_to_secs(day_frac)
-    c_hr, c_min, c_sec = secs_to_hr_min_sec(secs)
-    fmt_str = '{}:{}:{}'.format(c_hr, c_min, c_sec)
-    return fmt_str
-
-def datetime_to_day_frac(dt):
-    hrs = dt.time().hour
-    mins = dt.time().minute
-    secs = dt.time().second
-    return secs_to_day_frac((hrs * 60 * 60) + (mins * 60) + secs)
-
 def update_from(lut):
-    cur_time = secs_to_day_frac(secs_into_day())
-    logger.debug(time_from_day_frac(cur_time))
+    cur_time = convert.secs_to_day_frac(convert.secs_into_day())
+    logger.debug(convert.time_from_day_frac(cur_time))
 
     for i, st in enumerate(lut):
         next_start = st.start
@@ -189,25 +154,21 @@ def update_from(lut):
 
             # calculate remaining duration in current state
             dur = next_start - cur_time
-            dur_secs = day_frac_to_secs(dur)
+            dur_secs = convert.day_frac_to_secs(dur)
             logger.debug('dur secs remaining:        ' + str(dur_secs))
 
             # switch on at current pro-rated settings over 1s
             set_all_to_hsbk(cur_hue, cur_sat, cur_bright,
-                            cur_kelvin, SWITCH_ON_FADEIN)
-            time.sleep(SWITCH_ON_FADEIN)
+                            cur_kelvin, config.fade_in())
+            time.sleep(config.fade_in())
             set_all_to_hsbk(st.hue, st.sat, next_bright, st.kelvin, dur_secs)
             break
-
-def update_controller_pwr_states():
-    for c in CONTROLLERS:
-        c.write_message(controller_pwr_msg())
 
 def switch_off(from_controller):
     global lights_on
     lights_on = False
     c_s = str('brightness:0.0')
-    put_request(c_s, SWITCH_OFF_FADEOUT)
+    put_request(c_s, config.fade_out())
     if from_controller:  
         logger.info('received power switch from controller, switching off')
     else:
@@ -234,7 +195,7 @@ def put_request(c_s, duration):
          'color':c_s,
          'duration':duration,
         })
-    r = requests.put(STATE_URL, data, headers=creds.headers)
+    r = requests.put(config.state_url(), data, headers=creds.headers)
     logger.info(r)
 
 def set_all_to_hsbk(hue, saturation, brightness, kelvin, duration):
@@ -254,65 +215,6 @@ def set_all_to_hsbk(hue, saturation, brightness, kelvin, duration):
                   ' brightness:'+str(brightness)+
                   ' kelvin:'+str(kelvin))
     put_request(c_s, duration)
-
-def load_file():
-    with open('data.json') as data_file:
-        return json.load(data_file)
-
-def build_lut(data):
-    states = data['states']
-    lut = []
-    for s in states:
-        ls = LightState(s['name'], s['bright'], s['start'], s['hue'], s['sat'],
-                        kelvin=s['kelvin'])
-        lut.append(ls)
-    return lut
-
-def localize_lut(lut):
-    sunrise, sunset, noon, twilight = sun_events()
-    loc_lut = lut
-    for st in loc_lut:
-        if st.name == 'sunrise':
-            st.start = datetime_to_day_frac(sunrise)
-        elif st.name == 'sunset':
-            st.start = datetime_to_day_frac(sunset)
-        elif st.name == 'noon':
-            st.start = datetime_to_day_frac(noon)
-        elif st.name == 'twilight':
-            st.start = datetime_to_day_frac(twilight)
-    return loc_lut
-
-def sort_lut(lut):
-    return sorted(lut, key=lambda st: st.start)
-    
-def localize_and_sort(lut):
-    return sort_lut(localize_lut(build_lut(lut)))
-
-def sun_events():
-    o = ephem.Observer()
-    o.horizon = '-0:34' # navy almanac
-    o.pressure= 0
-    o.lat = str(DATA['lat'])
-    o.long = str(DATA['long'])
-    sun = ephem.Sun()
-    sun.compute()
-
-    if DATA['extended-sunlight-mode']:
-        o.date = "2015-06-21 00:00:00"
-        logger.info('EXTENDED SUNLIGHT MODE')
-
-    next_rising = o.next_rising(sun)
-    next_rise_time = ephem.localtime(next_rising)
-    logger.debug('next_rising:  ' + str(next_rise_time))
-    next_noon_time = ephem.localtime(o.next_transit(sun, start=next_rising))
-    logger.debug('next_noon: ' + str(next_noon_time))
-    beg_twilight = ephem.localtime(o.previous_rising(ephem.Sun(),
-                                                     use_center=True))
-                                                     #Begin civil twilight
-    next_set_time = ephem.localtime(o.next_setting(sun))
-    logger.debug('next_setting: ' + str(next_set_time))
-    # if extended-daylight, add time after sundown
-    return next_rise_time, next_set_time, next_noon_time, beg_twilight
 
 def make_logger():
     logger = logging.getLogger('lifx_circ_trig')
@@ -341,14 +243,8 @@ def make_logger():
 logger = make_logger()
 logger.info('<<<<<<<<<<<<<<<<<< SYSTEM RESTART >>>>>>>>>>>>>>>>>>>>>')
 
-DATA = load_file()
-VERBOSE = DATA['verbose']
-SWITCH_ON_FADEIN = DATA['switch_on_fadein']
-SWITCH_OFF_FADEOUT = DATA['switch_off_fadeout']
-LIFX_URL = DATA['LIFX_URL']
-STATE_URL = DATA['STATE_URL']
-
-LOC_LUT = localize_and_sort(DATA)
+config.init()
+LOC_LUT = config.LOC_LUT
 
 test_connection()
 update_lights_on()
