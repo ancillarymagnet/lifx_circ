@@ -85,13 +85,14 @@ def lifx_url():
 def state_url():
     return DATA['STATE_URL']
 
-def start_logger():
+def fetch_logger():
     global logger
-    logger = logging.getLogger('lifx_circ_trig.config')
+    return logging.getLogger('lifx_circ_trig.config')
 
 def init():
     global DATA
     global LOC_LUT
-    start_logger()
+    global logger
+    logger = fetch_logger()
     DATA = load_file()
     LOC_LUT = localize_and_sort(DATA)

@@ -11,8 +11,6 @@ TO DO:
 """
 
 import json
-import logging
-import logging.handlers
 import requests
 import time
 
@@ -23,8 +21,8 @@ import tornado.ioloop
 import config
 import creds
 import convert
+import log
 
-LOG_FILENAME = 'logs/lifx_circ_trig.log'
 ALL_API_URL = 'https://api.lifx.com/v1/lights/all'
 PORT = 7777
 CONTROLLERS = []
@@ -219,31 +217,9 @@ def set_all_to_hsbk(hue, saturation, brightness, kelvin, duration):
                   ' kelvin:'+str(kelvin))
     put_request(c_s, duration)
 
-def make_logger():
-    logger = logging.getLogger('lifx_circ_trig')
-    logger.setLevel(logging.DEBUG)
-    # create file handler which logs even debug messages
-    fh = logging.handlers.RotatingFileHandler(
-                          LOG_FILENAME, maxBytes=50000, backupCount=5)
-    fh.setLevel(logging.DEBUG)
-    # create console handler with a higher log level
-    ch = logging.StreamHandler()
-    ch.setLevel(logging.ERROR)
-    formatter = logging.Formatter('%(asctime)s - %(name)s - %(levelname)s - %(message)s')
-    ch.setFormatter(formatter)
-    fh.setFormatter(formatter)
-    logger.addHandler(ch)
-    logger.addHandler(fh)
-    # define a Handler which writes INFO messages or higher to the sys.stderr
-    console = logging.StreamHandler()
-    console.setLevel(logging.INFO)
-    formatter = logging.Formatter('%(name)-12s: %(levelname)-8s %(message)s')
-    console.setFormatter(formatter)
-    logging.getLogger('').addHandler(console)    
-    return logger
 
 
-logger = make_logger()
+logger = log.make_logger()
 inf('<<<<<<<<<<<<<<<<<< SYSTEM RESTART >>>>>>>>>>>>>>>>>>>>>')
 
 config.init()
