@@ -47,3 +47,9 @@ def time_from_day_frac(day_frac):
     fmt_str = '{}:{}:{}'.format(c_hr, c_min, c_sec)
     return fmt_str
     
+def interp(start, end, frac):
+    return frac * (end - start) + start
+    
+def current_time():
+    ct =  secs_to_day_frac(secs_into_day())
+    return ct

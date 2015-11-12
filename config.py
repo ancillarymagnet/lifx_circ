@@ -40,14 +40,14 @@ def localize_lut(lut):
 
 def sort_lut(lut):
     return sorted(lut, key=lambda st: st.start)
-    
+
 def localize_and_sort(lut):
     return sort_lut(localize_lut(build_lut(lut)))
 
 def sun_events():
     o = ephem.Observer()
     o.horizon = '-0:34' # navy almanac
-    o.pressure= 0
+    o.pressure = 0
     o.lat = str(DATA['lat'])
     o.long = str(DATA['long'])
     sun = ephem.Sun()
@@ -55,44 +55,130 @@ def sun_events():
 
     if DATA['extended-sunlight-mode']:
         o.date = "2015-06-21 00:00:00"
-        logger.info('EXTENDED SUNLIGHT MODE')
+        inf('EXTENDED SUNLIGHT MODE')
 
     next_rising = o.next_rising(sun)
     next_rise_time = ephem.localtime(next_rising)
-    logger.debug('next_rising:  ' + str(next_rise_time))
+    dbg('next_rising:  ' + str(next_rise_time))
     next_noon_time = ephem.localtime(o.next_transit(sun, start=next_rising))
-    logger.debug('next_noon: ' + str(next_noon_time))
+    dbg('next_noon: ' + str(next_noon_time))
     beg_twilight = ephem.localtime(o.previous_rising(ephem.Sun(),
                                                      use_center=True))
                                                      #Begin civil twilight
     next_set_time = ephem.localtime(o.next_setting(sun))
-    logger.debug('next_setting: ' + str(next_set_time))
+    dbg('next_setting: ' + str(next_set_time))
     # if extended-daylight, add time after sundown
     return next_rise_time, next_set_time, next_noon_time, beg_twilight
 
+def cur_state_index():
+    cur_time = convert.current_time()
+
+    for i, st in enumerate(LOC_LUT):
+        if st.start > cur_time:
+            return i
+    return 0
+
+def wrap_index(lst, i):
+    if i > len(lst) - 1:
+        i = 0
+    return i
+
+def state_now():
+    cur_time = convert.current_time()
+    cur_index = cur_state_index()
+    st = LOC_LUT[cur_index]
+
+    # handle wrapping around 0
+    if cur_index is 0:
+        prev_index = len(LOC_LUT) - 1
+    else:
+        prev_index = cur_index - 1
+
+    pv_st = LOC_LUT[prev_index]
+
+    dbg('currently in state:        ' + str(pv_st.name))
+    dbg('current state start time:  ' + str(pv_st.start))
+    dbg('cur_time:                  ' + str(cur_time))
+    dbg('next state:                ' + str(st.name))
+    dbg('next state start time:     ' + str(st.start))
+
+    # calculate how far we are into the current state
+    time_in = cur_time - pv_st.start
+    dbg('abs time in to this state: ' + str(time_in))
+
+    # calculate what percentage we are into the current state
+    frac_in = time_in / (st.start - pv_st.start)
+    dbg('frac in:                   ' + str(frac_in))
+
+    cur_hue = convert.interp(pv_st.hue, st.hue, frac_in)
+    dbg('cur_hue:                   ' + str(cur_hue))
+
+    cur_sat = convert.interp(pv_st.sat, st.sat, frac_in)
+    dbg('cur_sat:                   '+str(cur_sat))
+
+    cur_bright = convert.interp(pv_st.bright, st.bright, frac_in)
+    dbg('cur_bright:                '+str(cur_bright))
+
+    cur_kelvin = int(convert.interp(pv_st.kelvin, st.kelvin, frac_in))
+    dbg('cur_kelvin:                '+str(cur_kelvin))
+
+    cur_st = LightState(st.name, cur_bright, st.start,
+                        cur_hue, cur_sat, cur_kelvin)
+    return cur_st
+
+def secs_to_next_state():
+    cur_time = convert.current_time()
+    st = LOC_LUT[cur_state_index()]
+    # calculate remaining duration in current state
+    if st.start < cur_time:
+        # this would be in the event that we're in the last scene of the lut
+        dur = (1 - cur_time) + st.start
+    else:
+        dur = st.start - cur_time
+    t = convert.day_frac_to_secs(dur)
+    dbg('secs to next state:        ' + str(t))
+    return t
+
+def next_state():
+    cur_index = cur_state_index()
+    nxt_index = wrap_index(LOC_LUT, cur_index + 1)
+    nxt_st = LOC_LUT[nxt_index]
+#    nxt_nxt_index = wrap_index(LOC_LUT, nxt_index + 1)
+#    nxt_nxt_st = LOC_LUT[nxt_nxt_index]
+    # calculate duration of next state
+#    if nxt_nxt_st.start < nxt_st.start:
+#        # this would be in the event that the next is last scene of the lut
+#        dur = (1 - nxt_st.start) + nxt_nxt_st.start
+#    else:
+#        dur = nxt_nxt_st.start - nxt_st.start
+#    dur_secs = convert.day_frac_to_secs(dur)
+    return nxt_st
+
+def inf(msg):
+    logger.info(msg)
+
+def dbg(msg):
+    logger.debug(msg)
+
 def verbose():
     return DATA['verbose']
-    
+
 def fade_in():
     return DATA['switch_on_fadein']
-    
+
 def fade_out():
     return DATA['switch_off_fadeout']
 
 def lifx_url():
     return DATA['LIFX_URL']
-    
+
 def state_url():
     return DATA['STATE_URL']
 
-def fetch_logger():
-    global logger
-    return logging.getLogger('lifx_circ_trig.config')
-
-def init():
-    global DATA
+def refresh_solar():
     global LOC_LUT
-    global logger
-    logger = fetch_logger()
-    DATA = load_file()
     LOC_LUT = localize_and_sort(DATA)
+
+logger = logging.getLogger('lifx_circ_trig.config')
+DATA = load_file()
+LOC_LUT = localize_and_sort(DATA)
