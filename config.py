@@ -5,9 +5,10 @@ Created on Sun Nov  8 12:42:54 2015
 @author: handsheik
 """
 
-import convert
 import ephem
 import json
+
+import convert
 from lightstate import LightState
 import logging
 
