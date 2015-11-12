@@ -56,22 +56,6 @@ class SwitchWSHandler(tornado.websocket.WebSocketHandler):
     def check_origin(self, origin):
         return True
 
-class ScheduleWSHandler(tornado.websocket.WebSocketHandler):
-    """Receives control from scheduler"""
-    def open(self):
-        inf('connected to scheduler')
-        self.write_message('yo homie server here')
-
-    def on_message(self, message):
-        inf('schedule message received:  %s' % message)
-        self.write_message('server: got it')
-
-    def on_close(self):
-        inf('connection to scheduler closed')
-
-    def check_origin(self, origin):
-        return True
-
 def controller_pwr_msg():
     return "{ \"power_on\": \"%s\" }" % (is_on())
 
@@ -99,7 +83,7 @@ def test_connection():
     dbg(power_state())
 
 def is_on():
-    if (power_state() == 'on'):
+    if power_state() == 'on':
         return True
     else:
         return False
@@ -124,8 +108,8 @@ def switch(pwr, from_controller):
         t = config.fade_in()
     else:
         t = config.fade_out()
-    set_all_to_hsbkdp(c_st.hue, c_st.sat, c_st.bright, 
-                    c_st.kelvin, t, pwr)
+    set_all_to_hsbkdp(c_st.hue, c_st.sat, c_st.bright,
+                      c_st.kelvin, t, pwr)
 
 #@gen.coroutine
 def goto_next_state():
@@ -142,8 +126,8 @@ def goto_next_state():
     set_all_to_hsbkdp(st.hue, st.sat, st.bright, st.kelvin, t)
 
 
-def set_all_to_hsbkdp(hue, saturation, brightness, kelvin, 
-                      duration, pwr = None):
+def set_all_to_hsbkdp(hue, saturation, brightness, kelvin,
+                      duration, pwr=None):
     if pwr == None:
         pwr = power_state()
     if pwr == 'off':
@@ -185,12 +169,9 @@ inf('<<<<<<<<<<<<<<<<<< SYSTEM RESTART >>>>>>>>>>>>>>>>>>>>>')
 
 test_connection()
 
-
-
 # background update sunrise / sunset every day
-refresh_solar_info = tornado.ioloop.PeriodicCallback(
-            config.refresh_solar(),
-            60 * 60 * 24 * 1000)
+refresh_solar_info = tornado.ioloop.PeriodicCallback(config.refresh_solar(),
+                                                     60 * 60 * 24 * 1000)
 refresh_solar_info.start()
 
 
@@ -198,7 +179,7 @@ refresh_solar_info.start()
 #goto_next_state()
 
 #secs_to_next_state = config.secs_to_next_state()
-#set_all_to_hsbk(nxt_st.hue, nxt_st.sat, 
+#set_all_to_hsbk(nxt_st.hue, nxt_st.sat,
 #                nxt_st.bright, nxt_st.kelvin, secs_to_next_state)
 
 #begin_from(config.LOC_LUT)
@@ -207,7 +188,6 @@ application = tornado.web.Application(
     handlers=[
         (r"/", IndexHandler),
         (r"/ws", SwitchWSHandler),
-        (r"/scheduler", ScheduleWSHandler),
     ])
 
 http_server = tornado.httpserver.HTTPServer(application)
