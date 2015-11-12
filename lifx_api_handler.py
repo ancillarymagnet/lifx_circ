@@ -103,6 +103,12 @@ def test_connection():
         inf('///////////')
     dbg(power_state())
 
+def is_on():
+    if (power_state() == 'on'):
+        return True
+    else:
+        return False
+
 def power_state():
     response_json = get_states()
     return response_json[1][u'power']
@@ -123,12 +129,13 @@ def switch_off(from_controller):
     global lights_on
     lights_on = False
     c_s = str('brightness:0.0')
+    pwr = 'off'
     if from_controller:
         inf('received power switch from controller, switching off')
     else:
         inf('notifying controller of power state switch off')
         update_controller_pwr_states()
-    put_request(c_s, config.fade_out())
+    put_request(c_s, pwr, config.fade_out())
 
 def switch_on(from_controller):
     global lights_on
@@ -227,6 +234,9 @@ def goto_next_state():
 def set_all_to_hsbk(hue, saturation, brightness, kelvin, duration):
     if not lights_on:
         brightness = 0
+        pwr = 'off'
+    else:
+        pwr = 'on'
     if saturation:
         # we are setting a color - assign Kelvin first
         c_s = str('kelvin:'+str(kelvin) +
@@ -240,17 +250,17 @@ def set_all_to_hsbk(hue, saturation, brightness, kelvin, duration):
                   ' saturation:'+str(saturation)+
                   ' brightness:'+str(brightness)+
                   ' kelvin:'+str(kelvin))
-    put_request(c_s, duration)
+    put_request(c_s, pwr, duration)
 
-def put_request(c_s, duration):
+def put_request(c_s, pwr, duration):
     """ take a formatted color string and duration float
     and put that request to the LIFX API """
-    inf('put request: {}, {}'.format(c_s, duration))
+    inf('put request: {}, {}, {}s'.format(c_s, pwr, duration))
     data = json.dumps(
         {'selector':'all',
-         'power':'on',
-         'color':c_s,
-         'duration':duration,
+         'power': pwr,
+         'color': c_s,
+         'duration': duration,
         })
     r = requests.put(config.state_url(), data, headers=creds.headers)
     inf(r)
@@ -264,6 +274,8 @@ inf('<<<<<<<<<<<<<<<<<< SYSTEM RESTART >>>>>>>>>>>>>>>>>>>>>')
 test_connection()
 update_lights_on()
 
+
+
 # background update sunrise / sunset every day
 refresh_solar_info = tornado.ioloop.PeriodicCallback(
             config.refresh_solar(),
@@ -271,8 +283,9 @@ refresh_solar_info = tornado.ioloop.PeriodicCallback(
 refresh_solar_info.start()
 
 
-switch_on(True)
-goto_next_state()
+#switch_on(True)
+#goto_next_state()
+
 #secs_to_next_state = config.secs_to_next_state()
 #set_all_to_hsbk(nxt_st.hue, nxt_st.sat, 
 #                nxt_st.bright, nxt_st.kelvin, secs_to_next_state)
