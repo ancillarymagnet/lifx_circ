@@ -74,7 +74,6 @@ n@hardwork.party -->
         // Open Websocket callback
         ws.onopen = function(evt) { 
           $("#warning").hide();
-          $("div#controls").show();
           console.log("***Connection Opened***");
         };
 
@@ -85,6 +84,7 @@ n@hardwork.party -->
         });
 
         function updatePowerUI(pwr){
+          $("div#controls").show();
           uiUpdate = true;
           if (pwr == "True") { 
            togglePwrOn();

@@ -11,26 +11,21 @@ TO DO:
 • CONFIRM SWITCH RESPONSE
 """
 
-import datetime
 import json
 import requests
-import time
 
 import tornado.websocket
 import tornado.httpserver
 import tornado.ioloop
-from tornado import gen
+#from tornado import gen
 
 import log
 import config
 import creds
-import convert
-
 
 ALL_API_URL = 'https://api.lifx.com/v1/lights/all'
 PORT = 7777
 CONTROLLERS = []
-lights_on = True
 
 class IndexHandler(tornado.web.RequestHandler):
     """HTTP request handler to serve HTML for switch server"""
@@ -48,9 +43,9 @@ class SwitchWSHandler(tornado.websocket.WebSocketHandler):
     def on_message(self, message):
         inf('SWITCH message received: {msg}'.format(msg=message))
         if message == 'ON' or message == 'on':
-            switch_on(True)
+            switch('on', True)
         elif message == 'OFF' or message == 'off':
-            switch_off(True)
+            switch('off', True)
         else:
             inf('UNUSABLE MESSAGE FROM SWITCH')
 
@@ -78,7 +73,7 @@ class ScheduleWSHandler(tornado.websocket.WebSocketHandler):
         return True
 
 def controller_pwr_msg():
-    return "{ \"power_on\": \"%s\" }" % (lights_on)
+    return "{ \"power_on\": \"%s\" }" % (is_on())
 
 def update_controller_pwr_states():
     for con in CONTROLLERS:
@@ -118,103 +113,19 @@ def get_states():
                             headers=creds.headers)
     return json.loads(response.text)
 
-def update_lights_on():
-    global lights_on
-    if power_state() == "on":
-        lights_on = True
-    else:
-        lights_on = False
-
-def switch_off(from_controller):
-    global lights_on
-    lights_on = False
-    c_s = str('brightness:0.0')
-    pwr = 'off'
+def switch(pwr, from_controller):
     if from_controller:
-        inf('received power switch from controller, switching off')
+        inf('received power switch from controller, switching {p}'.format(p=pwr))
     else:
-        inf('notifying controller of power state switch off')
-        update_controller_pwr_states()
-    put_request(c_s, pwr, config.fade_out())
-
-def switch_on(from_controller):
-    global lights_on
-    lights_on = True
-    if from_controller:
-        inf('received power switch from controller, switching on')
-    else:
-        inf('notifying controller of power state switch on')
+        inf('notifying controller of power state switch {p}'.format(p=pwr))
         update_controller_pwr_states()
     c_st = config.state_now()
-    set_all_to_hsbk(c_st.hue, c_st.sat, c_st.bright, 
-                    c_st.kelvin, config.fade_in())
-
-
-def begin_from(lut):
-    cur_time = convert.current_time()
-
-    for i, st in enumerate(lut):
-        next_start = st.start
-
-        if next_start > cur_time:
-            # st is our next state
-            # we are currently in transition towards st
-
-            # handle wrapping around 0
-            if i is 0:
-                prev_index = len(lut) - 1
-            else:
-                prev_index = i - 1
-
-            pv_st = lut[prev_index]
-
-            dbg('currently in state:        '+str(pv_st.name))
-            dbg('current state start time:  ' + str(pv_st.start))
-            dbg('cur_time:                  '+str(cur_time))
-            dbg('next state:                ' + str(st.name))
-            dbg('next state start time:     ' + str(next_start))
-
-            # calculate how far we are into the current state
-            time_in = cur_time - pv_st.start
-            dbg('abs time in to this state: ' + str(time_in))
-
-            # calculate what percentage we are into the current state
-            frac_in = time_in / (next_start - pv_st.start)
-            dbg('frac in:                   ' + str(frac_in))
-
-            cur_hue = convert.interp(pv_st.hue, st.hue, frac_in)
-            dbg('cur_hue:                   ' + str(cur_hue))
-
-            cur_sat = convert.interp(pv_st.sat, st.sat, frac_in)
-            dbg('cur_sat:                   '+str(cur_sat))
-
-            cur_bright = convert.interp(pv_st.bright, st.bright, frac_in)
-            next_bright = st.bright
-            dbg('cur_bright:                '+str(cur_bright))
-
-            cur_kelvin = int(convert.interp(pv_st.kelvin, st.kelvin, frac_in))
-            dbg('cur_kelvin:                '+str(cur_kelvin))
-
-            # calculate remaining duration in current state
-            if next_start < cur_time:
-                dur = (1 - cur_time) + next_start
-            else:
-                dur = next_start - cur_time
-            dur_secs = convert.day_frac_to_secs(dur)
-            dbg('dur secs remaining:        ' + str(dur_secs))
-
-            # switch on at current pro-rated settings over 1s
-            set_all_to_hsbk(cur_hue, cur_sat, cur_bright,
-                            cur_kelvin, config.fade_in())
-            time.sleep(config.fade_in())
-            set_all_to_hsbk(st.hue, st.sat, next_bright, st.kelvin, dur_secs)
-
-            # handle wrapping around 0
-            nxt = wrap_index(lut, i+1)
-
-            tornado.ioloop.IOLoop.instance().add_timeout(
-                datetime.timedelta(seconds=dur_secs), goto_next_state(config.LOC_LUT, nxt))
-            break
+    if pwr == 'on':
+        t = config.fade_in()
+    else:
+        t = config.fade_out()
+    set_all_to_hsbkdp(c_st.hue, c_st.sat, c_st.bright, 
+                    c_st.kelvin, t, pwr)
 
 #@gen.coroutine
 def goto_next_state():
@@ -228,15 +139,16 @@ def goto_next_state():
 #    tornado.ioloop.IOLoop.instance().add_timeout(
 #                datetime.timedelta(seconds=dur_secs),
 #                goto_next(config.LOC_LUT, nxt_nxt_index))
-    set_all_to_hsbk(st.hue, st.sat, st.bright, st.kelvin, t)
+    set_all_to_hsbkdp(st.hue, st.sat, st.bright, st.kelvin, t)
 
 
-def set_all_to_hsbk(hue, saturation, brightness, kelvin, duration):
-    if not lights_on:
+def set_all_to_hsbkdp(hue, saturation, brightness, kelvin, 
+                      duration, pwr = None):
+    if pwr == None:
+        pwr = power_state()
+    if pwr == 'off':
         brightness = 0
-        pwr = 'off'
-    else:
-        pwr = 'on'
+
     if saturation:
         # we are setting a color - assign Kelvin first
         c_s = str('kelvin:'+str(kelvin) +
@@ -272,7 +184,6 @@ logger = log.make_logger()
 inf('<<<<<<<<<<<<<<<<<< SYSTEM RESTART >>>>>>>>>>>>>>>>>>>>>')
 
 test_connection()
-update_lights_on()
 
 
 
@@ -283,7 +194,7 @@ refresh_solar_info = tornado.ioloop.PeriodicCallback(
 refresh_solar_info.start()
 
 
-#switch_on(True)
+#switch('on', True)
 #goto_next_state()
 
 #secs_to_next_state = config.secs_to_next_state()
