@@ -1,8 +1,7 @@
 # -*- coding: utf-8 -*-
 """
-Created on Wed Oct 21 13:08:21 2015
-
-@author: handsheik
+@author: Noah Norman
+n@hardwork.party
 """
 import json
 

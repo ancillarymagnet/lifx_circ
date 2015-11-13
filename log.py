@@ -1,8 +1,7 @@
 # -*- coding: utf-8 -*-
 """
-Created on Sun Nov  8 22:03:07 2015
-
-@author: handsheik
+@author: Noah Norman
+n@hardwork.party
 """
 
 import logging

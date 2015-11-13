@@ -1,8 +1,7 @@
 # -*- coding: utf-8 -*-
 """
-Created on Sun Nov  8 12:42:54 2015
-
-@author: handsheik
+@author: Noah Norman
+n@hardwork.party
 """
 
 import ephem
@@ -73,54 +72,47 @@ def sun_events():
 
 def cur_state_index():
     cur_time = convert.current_time()
-
     for i, st in enumerate(LOC_LUT):
         if st.start > cur_time:
-            return i
-    return 0
+            return wrap_index(LOC_LUT, i - 1)
+    return len(LOC_LUT) - 1
 
 def wrap_index(lst, i):
     if i > len(lst) - 1:
         i = 0
+    elif i < 0:
+        i = len(lst) - 1
     return i
 
 def state_now():
     cur_time = convert.current_time()
-    cur_index = cur_state_index()
-    st = LOC_LUT[cur_index]
+    st = LOC_LUT[cur_state_index()]
+    nxt_st = next_state()
 
-    # handle wrapping around 0
-    if cur_index is 0:
-        prev_index = len(LOC_LUT) - 1
-    else:
-        prev_index = cur_index - 1
-
-    pv_st = LOC_LUT[prev_index]
-
-    dbg('currently in state:        ' + str(pv_st.name))
-    dbg('current state start time:  ' + str(pv_st.start))
-    dbg('cur_time:                  ' + str(cur_time))
-    dbg('next state:                ' + str(st.name))
-    dbg('next state start time:     ' + str(st.start))
-
+    inf('currently in state:        ' + str(st.name))
+    inf('current state start time:  ' + str(st.start))
+    inf('cur_time:                  ' + str(cur_time))
+    inf('next state:                ' + str(nxt_st.name))
+    inf('next state start time:     ' + str(nxt_st.start))
+    
     # calculate how far we are into the current state
-    time_in = cur_time - pv_st.start
+    time_in = cur_time - st.start
     dbg('abs time in to this state: ' + str(time_in))
 
     # calculate what percentage we are into the current state
-    frac_in = time_in / (st.start - pv_st.start)
+    frac_in = time_in / (nxt_st.start - st.start)
     dbg('frac in:                   ' + str(frac_in))
 
-    cur_hue = convert.interp(pv_st.hue, st.hue, frac_in)
+    cur_hue = convert.interp(st.hue, nxt_st.hue, frac_in)
     dbg('cur_hue:                   ' + str(cur_hue))
 
-    cur_sat = convert.interp(pv_st.sat, st.sat, frac_in)
+    cur_sat = convert.interp(st.sat, nxt_st.sat, frac_in)
     dbg('cur_sat:                   '+str(cur_sat))
 
-    cur_bright = convert.interp(pv_st.bright, st.bright, frac_in)
+    cur_bright = convert.interp(st.bright, nxt_st.bright, frac_in)
     dbg('cur_bright:                '+str(cur_bright))
 
-    cur_kelvin = int(convert.interp(pv_st.kelvin, st.kelvin, frac_in))
+    cur_kelvin = int(convert.interp(st.kelvin, nxt_st.kelvin, frac_in))
     dbg('cur_kelvin:                '+str(cur_kelvin))
 
     cur_st = LightState(st.name, cur_bright, st.start,
@@ -129,13 +121,13 @@ def state_now():
 
 def secs_to_next_state():
     cur_time = convert.current_time()
-    st = LOC_LUT[cur_state_index()]
+    nxt_st = next_state()
     # calculate remaining duration in current state
-    if st.start < cur_time:
+    if nxt_st.start < cur_time:
         # this would be in the event that we're in the last scene of the lut
-        dur = (1 - cur_time) + st.start
+        dur = (1 - cur_time) + nxt_st.start
     else:
-        dur = st.start - cur_time
+        dur = nxt_st.start - cur_time
     t = convert.day_frac_to_secs(dur)
     dbg('secs to next state:        ' + str(t))
     return t

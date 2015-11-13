@@ -1,23 +1,26 @@
 # -*- coding: utf-8 -*-
 """
-Created on Fri Oct 16 08:36:28 2015
+lifx_bg.py 
+a circadian light controller and interface for LIFX HTTP API v1
+@author: Noah Norman
+n@hardwork.party
 
-@author: handsheik
 
 TO DO:
 • HTTP BYPASS SWITCH
 • AUTO - FIRE NEXT CUE
-• SUNRISE / SET RESET AT MIDNIGHT?
 • CONFIRM SWITCH RESPONSE
 """
 
+#import datetime
 import json
 import requests
+import time
 
 import tornado.websocket
 import tornado.httpserver
 import tornado.ioloop
-#from tornado import gen
+from tornado import gen
 
 import log
 import config
@@ -111,20 +114,29 @@ def switch(pwr, from_controller):
     set_all_to_hsbkdp(c_st.hue, c_st.sat, c_st.bright,
                       c_st.kelvin, t, pwr)
 
+def start():
+    st = config.state_now()
+    set_all_to_hsbkdp(st.hue, st.sat, st.bright, st.kelvin, config.fade_in())
+    t = config.secs_to_next_state()
+    go_next_in(t)
+
 #@gen.coroutine
 def goto_next_state():
-    st = config.next_state()
+    nxt_st = config.next_state()
     t = config.secs_to_next_state()
 
-    dbg('transitioning to:          ' + str(st.name))
-    dbg('over:                      ' + str(t))
+    inf('transitioning to:          ' + str(nxt_st.name))
+    inf('over:                      ' + str(t))
 
-#    nxt_nxt_index = wrap_index(lut, nxt_index+1)
-#    tornado.ioloop.IOLoop.instance().add_timeout(
-#                datetime.timedelta(seconds=dur_secs),
-#                goto_next(config.LOC_LUT, nxt_nxt_index))
-    set_all_to_hsbkdp(st.hue, st.sat, st.bright, st.kelvin, t)
+    set_all_to_hsbkdp(nxt_st.hue, nxt_st.sat, nxt_st.bright, nxt_st.kelvin, t)
+    go_next_in(t+1)
 
+
+@gen.engine
+def go_next_in(t):
+    inf('WAITING {s}s TO NEXT TRANSITION'.format(s=t))
+    yield gen.Task(tornado.ioloop.IOLoop.instance().add_timeout, time.time() + t)
+    goto_next_state()
 
 def set_all_to_hsbkdp(hue, saturation, brightness, kelvin,
                       duration, pwr=None):
@@ -161,9 +173,6 @@ def put_request(c_s, pwr, duration):
     r = requests.put(config.state_url(), data, headers=creds.headers)
     inf(r)
 
-def test():
-    inf('TEST!!!!')
-
 logger = log.make_logger()
 inf('<<<<<<<<<<<<<<<<<< SYSTEM RESTART >>>>>>>>>>>>>>>>>>>>>')
 
@@ -175,14 +184,12 @@ refresh_solar_info = tornado.ioloop.PeriodicCallback(config.refresh_solar(),
 refresh_solar_info.start()
 
 
-#switch('on', True)
-#goto_next_state()
+switch('on', False)
+goto_next_state()
+print 'state now: ' + str(config.state_now())
+print 'next state: ' + str(config.next_state())
+print 'secs to next state: ' + str(config.secs_to_next_state())
 
-#secs_to_next_state = config.secs_to_next_state()
-#set_all_to_hsbk(nxt_st.hue, nxt_st.sat,
-#                nxt_st.bright, nxt_st.kelvin, secs_to_next_state)
-
-#begin_from(config.LOC_LUT)
 
 application = tornado.web.Application(
     handlers=[

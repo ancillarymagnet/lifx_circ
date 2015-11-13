@@ -1,8 +1,7 @@
 # -*- coding: utf-8 -*-
 """
-Created on Sun Nov  8 17:03:22 2015
-
-@author: handsheik
+@author: Noah Norman
+n@hardwork.party
 """
 
 import datetime
