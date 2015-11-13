@@ -101,6 +101,7 @@ def get_states():
                             headers=creds.headers)
     return json.loads(response.text)
 
+@gen.engine
 def switch(pwr, from_controller):
     if from_controller:
         inf('received power switch from controller, switching {p}'.format(p=pwr))
@@ -114,6 +115,9 @@ def switch(pwr, from_controller):
         t = config.fade_out()
     set_all_to_hsbkdp(c_st.hue, c_st.sat, c_st.bright,
                       c_st.kelvin, t, pwr)
+    # this command broke the existing transition so we have to put a new one
+    yield gen.Task(tornado.ioloop.IOLoop.instance().add_timeout, time.time() + t)
+    goto_next_state()
 
 def start():
     st = LUT.state_now()
@@ -121,7 +125,6 @@ def start():
     t = LUT.secs_to_next_state()
     go_next_in(t)
 
-#@gen.coroutine
 def goto_next_state():
     nxt_st = LUT.next_state()
     t = LUT.secs_to_next_state()
