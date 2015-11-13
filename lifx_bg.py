@@ -171,7 +171,7 @@ def put_request(c_s, pwr, duration):
          'color': c_s,
          'duration': duration,
         })
-    r = requests.put(config.lights_url(), data, headers=creds.headers)
+    r = requests.put(config.state_url(), data, headers=creds.headers)
     inf(r)
 
 logger = log.make_logger()

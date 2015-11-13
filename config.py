@@ -25,4 +25,7 @@ def lifx_url():
 def lights_url():
     return DATA['LIGHTS_URL']
 
+def state_url():
+    return DATA['STATE_URL']
+
 DATA = load_file()

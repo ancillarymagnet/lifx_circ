@@ -3,5 +3,6 @@
 	"switch_on_fadein":1.0,
 	"switch_off_fadeout":3.0,
 	"LIFX_URL":"https://api.lifx.com/v1/",
-	"LIGHTS_URL":"https://api.lifx.com/v1/lights/all"
+	"LIGHTS_URL":"https://api.lifx.com/v1/lights/all",
+	"STATE_URL":"https://api.lifx.com/v1/lights/all/state"
 }
