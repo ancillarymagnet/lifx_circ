@@ -23,12 +23,13 @@ import tornado.ioloop
 from tornado import gen
 
 import log
+import lut
 import config
 import creds
 
-ALL_API_URL = 'https://api.lifx.com/v1/lights/all'
 PORT = 7777
 CONTROLLERS = []
+LUT = lut.Lut();
 
 class IndexHandler(tornado.web.RequestHandler):
     """HTTP request handler to serve HTML for switch server"""
@@ -96,7 +97,7 @@ def power_state():
     return response_json[1][u'power']
 
 def get_states():
-    response = requests.get(ALL_API_URL,
+    response = requests.get(config.lights_url(),
                             headers=creds.headers)
     return json.loads(response.text)
 
@@ -106,7 +107,7 @@ def switch(pwr, from_controller):
     else:
         inf('notifying controller of power state switch {p}'.format(p=pwr))
         update_controller_pwr_states()
-    c_st = config.state_now()
+    c_st = LUT.state_now()
     if pwr == 'on':
         t = config.fade_in()
     else:
@@ -115,15 +116,15 @@ def switch(pwr, from_controller):
                       c_st.kelvin, t, pwr)
 
 def start():
-    st = config.state_now()
+    st = LUT.state_now()
     set_all_to_hsbkdp(st.hue, st.sat, st.bright, st.kelvin, config.fade_in())
-    t = config.secs_to_next_state()
+    t = LUT.secs_to_next_state()
     go_next_in(t)
 
 #@gen.coroutine
 def goto_next_state():
-    nxt_st = config.next_state()
-    t = config.secs_to_next_state()
+    nxt_st = LUT.next_state()
+    t = LUT.secs_to_next_state()
 
     inf('transitioning to:          ' + str(nxt_st.name))
     inf('over:                      ' + str(t))
@@ -170,7 +171,7 @@ def put_request(c_s, pwr, duration):
          'color': c_s,
          'duration': duration,
         })
-    r = requests.put(config.state_url(), data, headers=creds.headers)
+    r = requests.put(config.lights_url(), data, headers=creds.headers)
     inf(r)
 
 logger = log.make_logger()
@@ -179,16 +180,17 @@ inf('<<<<<<<<<<<<<<<<<< SYSTEM RESTART >>>>>>>>>>>>>>>>>>>>>')
 test_connection()
 
 # background update sunrise / sunset every day
-refresh_solar_info = tornado.ioloop.PeriodicCallback(config.refresh_solar(),
-                                                     60 * 60 * 24 * 1000)
+ms_in_a_day = 60 * 60 * 24 * 1000
+refresh_solar_info = tornado.ioloop.PeriodicCallback(LUT.refresh_solar(),
+                                                     ms_in_a_day)
 refresh_solar_info.start()
 
 
 switch('on', False)
 goto_next_state()
-print 'state now: ' + str(config.state_now())
-print 'next state: ' + str(config.next_state())
-print 'secs to next state: ' + str(config.secs_to_next_state())
+print 'state now: ' + str(LUT.state_now())
+print 'next state: ' + str(LUT.next_state())
+print 'secs to next state: ' + str(LUT.secs_to_next_state())
 
 
 application = tornado.web.Application(

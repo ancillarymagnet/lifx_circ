@@ -10,7 +10,7 @@ import logging.handlers
 LOG_FILENAME = 'logs/lifx_circ_trig.log'
 
 def make_logger():
-    logger = logging.getLogger('lifx_circ_trig')
+    logger = logging.getLogger('lct')
     logger.setLevel(logging.DEBUG)
     # create file handler which logs even debug messages
     fh = logging.handlers.RotatingFileHandler(

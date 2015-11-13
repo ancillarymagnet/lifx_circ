@@ -5,7 +5,7 @@ Created on Fri Nov  6 12:37:06 2015
 @author: handsheik
 """
 
-class LightState():
+class LightState(object):
     def __init__(self, name, bright, start,
                  hue=None, sat=None, kelvin=None):
         self.name = name
