@@ -13,6 +13,8 @@ If you enable the 'extended-sunlight-mode' flag, those events will be localized 
 You'll need to put your LIFX HTTP API token into the user_data.json 'token' field ... there's a dummy in there for now.
 You can generate that token for your account here: https://cloud.lifx.com/settings
 
+Run script is lifx_bg.py ...
+That hosts a bootstrap HTTP controller avail at localhost:7777 with a power switch ... will be adding a bypass to that sometime soon so you can override the LUT behavior and manually control settings.
 
 This is still WIP but I'm hacking on it.
 
