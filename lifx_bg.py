@@ -27,7 +27,7 @@ import lut
 import config
 import creds
 
-PORT = 7777
+PORT = 8888
 CONTROLLERS = []
 LUT = lut.Lut();
 
