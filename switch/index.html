@@ -47,8 +47,11 @@ n@hardwork.party -->
         $("#warning").show()
  
         var ws;
- 
+
+        // localhost is not working here from remote connections 
+        // so I've hard-coded the IP for the moment -- CORS issue? not sure
         var HOST = '10.0.1.200';
+
         var PORT = 8888;
         var URI = '/ws';
 
