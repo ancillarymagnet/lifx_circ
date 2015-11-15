@@ -16,6 +16,7 @@ import json
 import requests
 import time
 
+import socket
 import tornado.websocket
 import tornado.httpserver
 import tornado.ioloop
@@ -38,6 +39,7 @@ class IndexHandler(tornado.web.RequestHandler):
 class SwitchWSHandler(tornado.websocket.WebSocketHandler):
     """Communicates switch commands with the switch web view"""
     def open(self):
+#        self.set_header("Access-Control-Allow-Origin", '*')
         inf('new connection to switch, sending power state')
         msg = controller_pwr_msg()
         self.write_message(msg)
@@ -203,6 +205,8 @@ application = tornado.web.Application(
 
 http_server = tornado.httpserver.HTTPServer(application)
 http_server.listen(PORT)
+my_ip = socket.gethostbyname(socket.gethostname())
+inf('*** Server Started at {ip} ***'.format(ip=my_ip))
 inf('*** Server listening on port {port} ****'.format(port=PORT))
 
 # if you want to cancel this, hang on to next_timeout for cancel_timeout
