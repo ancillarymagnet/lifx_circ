@@ -1,0 +1,385 @@
+2015-11-14 00:20:22,649 - lct - INFO - -------- COLOR: {u'hue': 1.8731975280384527, u'saturation': 1.0, u'kelvin': 2518} ---------
+2015-11-14 00:20:22,652 - lct - INFO - -------- BRIGHT: 0.0594338902876 ---------
+2015-11-14 00:20:22,652 - lct - INFO - -------- POWER:  on ---------
+2015-11-14 00:20:22,652 - lct - INFO - ///////////
+2015-11-14 00:20:22,652 - lct - INFO - -------- LIGHT NUM: 1 ---------
+2015-11-14 00:20:22,652 - lct - INFO - -------- NAME: DINING TABLE --------
+2015-11-14 00:20:22,652 - lct - INFO - -------- COLOR: {u'hue': 1.8731975280384527, u'saturation': 1.0, u'kelvin': 2518} ---------
+2015-11-14 00:20:22,652 - lct - INFO - -------- BRIGHT: 0.0594338902876 ---------
+2015-11-14 00:20:22,652 - lct - INFO - -------- POWER:  on ---------
+2015-11-14 00:20:22,652 - lct - INFO - ///////////
+2015-11-14 00:20:23,151 - lct - DEBUG - on
+2015-11-14 00:20:23,151 - lct.lut - INFO - EXTENDED SUNLIGHT MODE
+2015-11-14 00:20:23,151 - lct.lut - DEBUG - next_rising:  2015-06-21 05:24:55.000006
+2015-11-14 00:20:23,151 - lct.lut - DEBUG - next_noon: 2015-06-21 12:57:37.000006
+2015-11-14 00:20:23,152 - lct.lut - DEBUG - next_setting: 2015-06-20 20:30:05.000005
+2015-11-14 00:20:23,152 - lct - INFO - notifying controller of power state switch on
+2015-11-14 00:20:23,153 - lct.lut - INFO - currently in state:        overnight
+2015-11-14 00:20:23,153 - lct.lut - INFO - current state start time:  0.0
+2015-11-14 00:20:23,153 - lct.lut - INFO - cur_time:                  0.0141550925926
+2015-11-14 00:20:23,153 - lct.lut - INFO - next state:                overnight-end
+2015-11-14 00:20:23,153 - lct.lut - INFO - next state start time:     0.2
+2015-11-14 00:20:23,153 - lct.lut - DEBUG - abs time in to this state: 0.0141550925926
+2015-11-14 00:20:23,153 - lct.lut - DEBUG - frac in:                   0.070775462963
+2015-11-14 00:20:23,153 - lct.lut - DEBUG - cur_hue:                   0.0
+2015-11-14 00:20:23,153 - lct.lut - DEBUG - cur_sat:                   1.0
+2015-11-14 00:20:23,153 - lct.lut - DEBUG - cur_bright:                0.02
+2015-11-14 00:20:23,153 - lct.lut - DEBUG - cur_kelvin:                2500
+2015-11-14 00:20:23,153 - lct - INFO - put request: kelvin:2500 hue:0.0 saturation:1.0 brightness:0.02, on, 1.0s
+2015-11-14 00:20:23,873 - lct - INFO - <Response [207]>
+2015-11-14 00:20:23,873 - lct.lut - DEBUG - secs to next state:        16057.0
+2015-11-14 00:20:23,873 - lct - INFO - transitioning to:          overnight-end
+2015-11-14 00:20:23,873 - lct - INFO - over:                      16057.0
+2015-11-14 00:20:24,486 - lct - INFO - put request: kelvin:2500 hue:0 saturation:1.0 brightness:0.02, on, 16057.0s
+2015-11-14 00:20:25,101 - lct - INFO - <Response [207]>
+2015-11-14 00:20:25,101 - lct - INFO - WAITING 16058.0s TO NEXT TRANSITION
+2015-11-14 00:20:25,101 - lct.lut - INFO - currently in state:        overnight
+2015-11-14 00:20:25,101 - lct.lut - INFO - current state start time:  0.0
+2015-11-14 00:20:25,101 - lct.lut - INFO - cur_time:                  0.0141782407407
+2015-11-14 00:20:25,101 - lct.lut - INFO - next state:                overnight-end
+2015-11-14 00:20:25,101 - lct.lut - INFO - next state start time:     0.2
+2015-11-14 00:20:25,101 - lct.lut - DEBUG - abs time in to this state: 0.0141782407407
+2015-11-14 00:20:25,101 - lct.lut - DEBUG - frac in:                   0.0708912037037
+2015-11-14 00:20:25,102 - lct.lut - DEBUG - cur_hue:                   0.0
+2015-11-14 00:20:25,102 - lct.lut - DEBUG - cur_sat:                   1.0
+2015-11-14 00:20:25,102 - lct.lut - DEBUG - cur_bright:                0.02
+2015-11-14 00:20:25,102 - lct.lut - DEBUG - cur_kelvin:                2500
+2015-11-14 00:20:25,102 - lct.lut - DEBUG - secs to next state:        16055.0
+2015-11-14 00:20:25,102 - lct - INFO - *** Server listening on port 7777 ****
+2015-11-14 00:20:25,103 - lct.lut - DEBUG - secs to next state:        16055.0
+2015-11-14 00:20:25,103 - lct - INFO - transitioning to:          overnight-end
+2015-11-14 00:20:25,103 - lct - INFO - over:                      16055.0
+2015-11-14 00:20:25,439 - lct - INFO - put request: kelvin:2500 hue:0 saturation:1.0 brightness:0.02, on, 16055.0s
+2015-11-14 00:20:26,022 - lct - INFO - <Response [207]>
+2015-11-14 00:20:26,022 - lct - INFO - WAITING 16056.0s TO NEXT TRANSITION
+2015-11-14 10:46:05,829 - lct - INFO - <<<<<<<<<<<<<<<<<< SYSTEM RESTART >>>>>>>>>>>>>>>>>>>>>
+2015-11-14 10:46:07,167 - lct - INFO - TESTING.......
+2015-11-14 10:46:07,167 - lct - INFO - -----------------
+2015-11-14 10:46:07,167 - lct - INFO - -------- LIGHT NUM: 0 ---------
+2015-11-14 10:46:07,167 - lct - INFO - -------- NAME: KITCHEN --------
+2015-11-14 10:46:07,167 - lct - INFO - -------- COLOR: {u'hue': 0.0, u'saturation': 0.0, u'kelvin': 2700} ---------
+2015-11-14 10:46:07,167 - lct - INFO - -------- BRIGHT: 0.499992370489 ---------
+2015-11-14 10:46:07,167 - lct - INFO - -------- POWER:  off ---------
+2015-11-14 10:46:07,168 - lct - INFO - ///////////
+2015-11-14 10:46:07,168 - lct - INFO - -------- LIGHT NUM: 1 ---------
+2015-11-14 10:46:07,168 - lct - INFO - -------- NAME: DINING TABLE --------
+2015-11-14 10:46:07,168 - lct - INFO - -------- COLOR: {u'hue': 0.0, u'saturation': 0.0, u'kelvin': 2700} ---------
+2015-11-14 10:46:07,168 - lct - INFO - -------- BRIGHT: 0.499992370489 ---------
+2015-11-14 10:46:07,168 - lct - INFO - -------- POWER:  off ---------
+2015-11-14 10:46:07,168 - lct - INFO - ///////////
+2015-11-14 10:46:08,128 - lct - DEBUG - off
+2015-11-14 10:46:08,128 - lct.lut - INFO - EXTENDED SUNLIGHT MODE
+2015-11-14 10:46:08,129 - lct.lut - DEBUG - next_rising:  2015-06-21 05:24:55.000006
+2015-11-14 10:46:08,129 - lct.lut - DEBUG - next_noon: 2015-06-21 12:57:37.000006
+2015-11-14 10:46:08,130 - lct.lut - DEBUG - next_setting: 2015-06-20 20:30:05.000005
+2015-11-14 10:46:08,131 - lct - INFO - notifying controller of power state switch on
+2015-11-14 10:46:08,131 - lct.lut - INFO - currently in state:        mid-morn
+2015-11-14 10:46:08,131 - lct.lut - INFO - current state start time:  0.4166
+2015-11-14 10:46:08,131 - lct.lut - INFO - cur_time:                  0.448703703704
+2015-11-14 10:46:08,131 - lct.lut - INFO - next state:                noon
+2015-11-14 10:46:08,131 - lct.lut - INFO - next state start time:     0.540011574074
+2015-11-14 10:46:08,132 - lct.lut - DEBUG - abs time in to this state: 0.0321037037037
+2015-11-14 10:46:08,132 - lct.lut - DEBUG - frac in:                   0.260135274544
+2015-11-14 10:46:08,132 - lct.lut - DEBUG - cur_hue:                   30.0
+2015-11-14 10:46:08,132 - lct.lut - DEBUG - cur_sat:                   0.0
+2015-11-14 10:46:08,132 - lct.lut - DEBUG - cur_bright:                0.852027054909
+2015-11-14 10:46:08,132 - lct.lut - DEBUG - cur_kelvin:                4390
+2015-11-14 10:46:08,132 - lct - INFO - put request: hue:30.0 saturation:0.0 brightness:0.852027054909 kelvin:4390, on, 1.0s
+2015-11-14 10:46:09,019 - lct - INFO - <Response [207]>
+2015-11-14 10:46:09,019 - lct.lut - DEBUG - secs to next state:        7888.0
+2015-11-14 10:46:09,020 - lct - INFO - transitioning to:          noon
+2015-11-14 10:46:09,020 - lct - INFO - over:                      7888.0
+2015-11-14 10:46:09,476 - lct - INFO - put request: hue:30 saturation:0 brightness:1.0 kelvin:5500, on, 7888.0s
+2015-11-14 10:46:09,964 - lct - INFO - <Response [207]>
+2015-11-14 10:46:09,964 - lct - INFO - WAITING 7889.0s TO NEXT TRANSITION
+2015-11-14 10:46:09,964 - lct.lut - INFO - currently in state:        mid-morn
+2015-11-14 10:46:09,964 - lct.lut - INFO - current state start time:  0.4166
+2015-11-14 10:46:09,964 - lct.lut - INFO - cur_time:                  0.448715277778
+2015-11-14 10:46:09,964 - lct.lut - INFO - next state:                noon
+2015-11-14 10:46:09,965 - lct.lut - INFO - next state start time:     0.540011574074
+2015-11-14 10:46:09,965 - lct.lut - DEBUG - abs time in to this state: 0.0321152777778
+2015-11-14 10:46:09,965 - lct.lut - DEBUG - frac in:                   0.260229058893
+2015-11-14 10:46:09,965 - lct.lut - DEBUG - cur_hue:                   30.0
+2015-11-14 10:46:09,965 - lct.lut - DEBUG - cur_sat:                   0.0
+2015-11-14 10:46:09,965 - lct.lut - DEBUG - cur_bright:                0.852045811779
+2015-11-14 10:46:09,965 - lct.lut - DEBUG - cur_kelvin:                4390
+2015-11-14 10:46:09,965 - lct.lut - DEBUG - secs to next state:        7888.0
+2015-11-14 10:46:09,966 - lct - INFO - *** Server listening on port 7777 ****
+2015-11-14 10:46:10,020 - lct.lut - DEBUG - secs to next state:        7887.0
+2015-11-14 10:46:10,020 - lct - INFO - transitioning to:          noon
+2015-11-14 10:46:10,020 - lct - INFO - over:                      7887.0
+2015-11-14 10:46:10,410 - lct - INFO - put request: hue:30 saturation:0 brightness:1.0 kelvin:5500, on, 7887.0s
+2015-11-14 10:46:10,908 - lct - INFO - <Response [207]>
+2015-11-14 10:46:10,909 - lct - INFO - WAITING 7888.0s TO NEXT TRANSITION
+2015-11-14 12:31:43,402 - lct - INFO - <<<<<<<<<<<<<<<<<< SYSTEM RESTART >>>>>>>>>>>>>>>>>>>>>
+2015-11-14 12:31:44,381 - lct - INFO - TESTING.......
+2015-11-14 12:31:44,381 - lct - INFO - -----------------
+2015-11-14 12:31:44,381 - lct - INFO - -------- LIGHT NUM: 0 ---------
+2015-11-14 12:31:44,381 - lct - INFO - -------- NAME: KITCHEN --------
+2015-11-14 12:31:44,381 - lct - INFO - -------- COLOR: {u'hue': 29.998626688029297, u'saturation': 0.0, u'kelvin': 5000} ---------
+2015-11-14 12:31:44,381 - lct - INFO - -------- BRIGHT: 0.749996185245 ---------
+2015-11-14 12:31:44,382 - lct - INFO - -------- POWER:  on ---------
+2015-11-14 12:31:44,382 - lct - INFO - ///////////
+2015-11-14 12:31:44,382 - lct - INFO - -------- LIGHT NUM: 1 ---------
+2015-11-14 12:31:44,382 - lct - INFO - -------- NAME: DINING TABLE --------
+2015-11-14 12:31:44,382 - lct - INFO - -------- COLOR: {u'hue': 29.998626688029297, u'saturation': 0.0, u'kelvin': 5000} ---------
+2015-11-14 12:31:44,382 - lct - INFO - -------- BRIGHT: 0.749996185245 ---------
+2015-11-14 12:31:44,382 - lct - INFO - -------- POWER:  on ---------
+2015-11-14 12:31:44,382 - lct - INFO - ///////////
+2015-11-14 12:31:44,852 - lct - DEBUG - on
+2015-11-14 12:31:44,852 - lct.lut - INFO - EXTENDED SUNLIGHT MODE
+2015-11-14 12:31:44,852 - lct.lut - DEBUG - next_rising:  2015-06-21 05:24:55.000006
+2015-11-14 12:31:44,852 - lct.lut - DEBUG - next_noon: 2015-06-21 12:57:37.000006
+2015-11-14 12:31:44,853 - lct.lut - DEBUG - next_setting: 2015-06-20 20:30:05.000005
+2015-11-14 12:31:44,854 - lct - INFO - notifying controller of power state switch on
+2015-11-14 12:31:44,855 - lct.lut - INFO - currently in state:        mid-morn
+2015-11-14 12:31:44,855 - lct.lut - INFO - current state start time:  0.4166
+2015-11-14 12:31:44,855 - lct.lut - INFO - cur_time:                  0.522037037037
+2015-11-14 12:31:44,855 - lct.lut - INFO - next state:                noon
+2015-11-14 12:31:44,855 - lct.lut - INFO - next state start time:     0.540011574074
+2015-11-14 12:31:44,855 - lct.lut - DEBUG - abs time in to this state: 0.105437037037
+2015-11-14 12:31:44,855 - lct.lut - DEBUG - frac in:                   0.854352906752
+2015-11-14 12:31:44,855 - lct.lut - DEBUG - cur_hue:                   30.0
+2015-11-14 12:31:44,855 - lct.lut - DEBUG - cur_sat:                   0.0
+2015-11-14 12:31:44,855 - lct.lut - DEBUG - cur_bright:                0.97087058135
+2015-11-14 12:31:44,855 - lct.lut - DEBUG - cur_kelvin:                5281
+2015-11-14 12:31:44,855 - lct - INFO - put request: hue:30.0 saturation:0.0 brightness:0.97087058135 kelvin:5281, on, 1.0s
+2015-11-14 12:31:45,562 - lct - INFO - <Response [207]>
+2015-11-14 12:31:45,563 - lct.lut - DEBUG - secs to next state:        1552.0
+2015-11-14 12:31:45,563 - lct - INFO - transitioning to:          noon
+2015-11-14 12:31:45,563 - lct - INFO - over:                      1552.0
+2015-11-14 12:31:46,112 - lct - INFO - put request: hue:30 saturation:0 brightness:1.0 kelvin:5500, on, 1552.0s
+2015-11-14 12:31:46,589 - lct - INFO - <Response [207]>
+2015-11-14 12:31:46,590 - lct - INFO - WAITING 1553.0s TO NEXT TRANSITION
+2015-11-14 12:31:46,590 - lct.lut - INFO - currently in state:        mid-morn
+2015-11-14 12:31:46,590 - lct.lut - INFO - current state start time:  0.4166
+2015-11-14 12:31:46,590 - lct.lut - INFO - cur_time:                  0.522060185185
+2015-11-14 12:31:46,590 - lct.lut - INFO - next state:                noon
+2015-11-14 12:31:46,590 - lct.lut - INFO - next state start time:     0.540011574074
+2015-11-14 12:31:46,590 - lct.lut - DEBUG - abs time in to this state: 0.105460185185
+2015-11-14 12:31:46,590 - lct.lut - DEBUG - frac in:                   0.854540475449
+2015-11-14 12:31:46,590 - lct.lut - DEBUG - cur_hue:                   30.0
+2015-11-14 12:31:46,590 - lct.lut - DEBUG - cur_sat:                   0.0
+2015-11-14 12:31:46,591 - lct.lut - DEBUG - cur_bright:                0.97090809509
+2015-11-14 12:31:46,591 - lct.lut - DEBUG - cur_kelvin:                5281
+2015-11-14 12:31:46,591 - lct.lut - DEBUG - secs to next state:        1551.0
+2015-11-14 12:31:46,591 - lct - INFO - *** Server listening on port 7777 ****
+2015-11-14 12:31:46,591 - lct.lut - DEBUG - secs to next state:        1551.0
+2015-11-14 12:31:46,592 - lct - INFO - transitioning to:          noon
+2015-11-14 12:31:46,592 - lct - INFO - over:                      1551.0
+2015-11-14 12:31:46,892 - lct - INFO - put request: hue:30 saturation:0 brightness:1.0 kelvin:5500, on, 1551.0s
+2015-11-14 12:31:47,565 - lct - INFO - <Response [207]>
+2015-11-14 12:31:47,565 - lct - INFO - WAITING 1552.0s TO NEXT TRANSITION
+2015-11-14 13:59:18,707 - lct.lut - DEBUG - secs to next state:        10260.24
+2015-11-14 13:59:18,708 - lct - INFO - transitioning to:          mid-day-end
+2015-11-14 13:59:18,708 - lct - INFO - over:                      10260.24
+2015-11-14 13:59:19,556 - lct - INFO - put request: hue:30 saturation:0 brightness:1.0 kelvin:5500, on, 10260.24s
+2015-11-14 13:59:20,001 - lct - INFO - <Response [207]>
+2015-11-14 13:59:20,001 - lct - INFO - WAITING 10261.24s TO NEXT TRANSITION
+2015-11-14 13:59:20,002 - lct.lut - DEBUG - secs to next state:        10258.24
+2015-11-14 13:59:20,002 - lct - INFO - transitioning to:          mid-day-end
+2015-11-14 13:59:20,002 - lct - INFO - over:                      10258.24
+2015-11-14 13:59:20,348 - lct - INFO - put request: hue:30 saturation:0 brightness:1.0 kelvin:5500, on, 10258.24s
+2015-11-14 13:59:20,842 - lct - INFO - <Response [207]>
+2015-11-14 13:59:20,842 - lct - INFO - WAITING 10259.24s TO NEXT TRANSITION
+2015-11-14 16:55:39,478 - lct - INFO - <<<<<<<<<<<<<<<<<< SYSTEM RESTART >>>>>>>>>>>>>>>>>>>>>
+2015-11-14 16:55:41,001 - lct - INFO - TESTING.......
+2015-11-14 16:55:41,001 - lct - INFO - -----------------
+2015-11-14 16:55:41,001 - lct - INFO - -------- LIGHT NUM: 0 ---------
+2015-11-14 16:55:41,001 - lct - INFO - -------- NAME: KITCHEN --------
+2015-11-14 16:55:41,001 - lct - INFO - -------- COLOR: {u'hue': 35.997253376058595, u'saturation': 0.11273365377279317, u'kelvin': 8000} ---------
+2015-11-14 16:55:41,001 - lct - INFO - -------- BRIGHT: 0.749996185245 ---------
+2015-11-14 16:55:41,001 - lct - INFO - -------- POWER:  on ---------
+2015-11-14 16:55:41,001 - lct - INFO - ///////////
+2015-11-14 16:55:41,001 - lct - INFO - -------- LIGHT NUM: 1 ---------
+2015-11-14 16:55:41,001 - lct - INFO - -------- NAME: DINING TABLE --------
+2015-11-14 16:55:41,001 - lct - INFO - -------- COLOR: {u'hue': 35.997253376058595, u'saturation': 0.11273365377279317, u'kelvin': 8000} ---------
+2015-11-14 16:55:41,001 - lct - INFO - -------- BRIGHT: 0.749996185245 ---------
+2015-11-14 16:55:41,001 - lct - INFO - -------- POWER:  on ---------
+2015-11-14 16:55:41,001 - lct - INFO - ///////////
+2015-11-14 16:55:41,682 - lct - DEBUG - on
+2015-11-14 16:55:41,682 - lct.lut - INFO - EXTENDED SUNLIGHT MODE
+2015-11-14 16:55:41,683 - lct.lut - DEBUG - next_rising:  2015-06-21 05:24:55.000006
+2015-11-14 16:55:41,683 - lct.lut - DEBUG - next_noon: 2015-06-21 12:57:37.000006
+2015-11-14 16:55:41,683 - lct.lut - DEBUG - next_setting: 2015-06-20 20:30:05.000005
+2015-11-14 16:55:41,685 - lct - INFO - notifying controller of power state switch on
+2015-11-14 16:55:41,685 - lct.lut - INFO - currently in state:        mid-day-end
+2015-11-14 16:55:41,685 - lct.lut - INFO - current state start time:  0.7016
+2015-11-14 16:55:41,685 - lct.lut - INFO - cur_time:                  0.705335648148
+2015-11-14 16:55:41,685 - lct.lut - INFO - next state:                sunset
+2015-11-14 16:55:41,685 - lct.lut - INFO - next state start time:     0.854224537037
+2015-11-14 16:55:41,685 - lct.lut - DEBUG - abs time in to this state: 0.00373564814815
+2015-11-14 16:55:41,686 - lct.lut - DEBUG - frac in:                   0.0244760653868
+2015-11-14 16:55:41,686 - lct.lut - DEBUG - cur_hue:                   30.4895213077
+2015-11-14 16:55:41,686 - lct.lut - DEBUG - cur_sat:                   0.0244760653868
+2015-11-14 16:55:41,686 - lct.lut - DEBUG - cur_bright:                0.988985770576
+2015-11-14 16:55:41,686 - lct.lut - DEBUG - cur_kelvin:                5438
+2015-11-14 16:55:41,686 - lct - INFO - put request: kelvin:5438 hue:30.4895213077 saturation:0.0244760653868 brightness:0.988985770576, on, 1.0s
+2015-11-14 16:55:42,630 - lct - INFO - <Response [207]>
+2015-11-14 16:55:42,630 - lct.lut - DEBUG - secs to next state:        12863.0
+2015-11-14 16:55:42,630 - lct - INFO - transitioning to:          sunset
+2015-11-14 16:55:42,630 - lct - INFO - over:                      12863.0
+2015-11-14 16:55:43,231 - lct - INFO - put request: kelvin:3000 hue:50 saturation:1.0 brightness:0.55, on, 12863.0s
+2015-11-14 16:55:43,873 - lct - INFO - <Response [207]>
+2015-11-14 16:55:43,873 - lct - INFO - WAITING 12864.0s TO NEXT TRANSITION
+2015-11-14 16:55:43,873 - lct.lut - INFO - currently in state:        mid-day-end
+2015-11-14 16:55:43,873 - lct.lut - INFO - current state start time:  0.7016
+2015-11-14 16:55:43,874 - lct.lut - INFO - cur_time:                  0.705358796296
+2015-11-14 16:55:43,874 - lct.lut - INFO - next state:                sunset
+2015-11-14 16:55:43,874 - lct.lut - INFO - next state start time:     0.854224537037
+2015-11-14 16:55:43,874 - lct.lut - DEBUG - abs time in to this state: 0.0037587962963
+2015-11-14 16:55:43,874 - lct.lut - DEBUG - frac in:                   0.0246277326652
+2015-11-14 16:55:43,874 - lct.lut - DEBUG - cur_hue:                   30.4925546533
+2015-11-14 16:55:43,874 - lct.lut - DEBUG - cur_sat:                   0.0246277326652
+2015-11-14 16:55:43,874 - lct.lut - DEBUG - cur_bright:                0.988917520301
+2015-11-14 16:55:43,874 - lct.lut - DEBUG - cur_kelvin:                5438
+2015-11-14 16:55:43,874 - lct.lut - DEBUG - secs to next state:        12862.0
+2015-11-14 16:55:43,875 - lct - INFO - *** Server listening on port 7777 ****
+2015-11-14 16:55:43,875 - lct.lut - DEBUG - secs to next state:        12862.0
+2015-11-14 16:55:43,875 - lct - INFO - transitioning to:          sunset
+2015-11-14 16:55:43,875 - lct - INFO - over:                      12862.0
+2015-11-14 16:55:44,430 - lct - INFO - put request: kelvin:3000 hue:50 saturation:1.0 brightness:0.55, on, 12862.0s
+2015-11-14 16:55:45,262 - lct - INFO - <Response [207]>
+2015-11-14 16:55:45,262 - lct - INFO - WAITING 12863.0s TO NEXT TRANSITION
+2015-11-14 19:25:49,659 - lct - INFO - <<<<<<<<<<<<<<<<<< SYSTEM RESTART >>>>>>>>>>>>>>>>>>>>>
+2015-11-14 19:25:50,823 - lct - INFO - TESTING.......
+2015-11-14 19:25:50,823 - lct - INFO - -----------------
+2015-11-14 19:25:50,823 - lct - INFO - -------- LIGHT NUM: 0 ---------
+2015-11-14 19:25:50,823 - lct - INFO - -------- NAME: KITCHEN --------
+2015-11-14 19:25:50,823 - lct - INFO - -------- COLOR: {u'hue': 44.14373998626688, u'saturation': 0.7074998092622263, u'kelvin': 3730} ---------
+2015-11-14 19:25:50,823 - lct - INFO - -------- BRIGHT: 0.681605249104 ---------
+2015-11-14 19:25:50,823 - lct - INFO - -------- POWER:  on ---------
+2015-11-14 19:25:50,823 - lct - INFO - ///////////
+2015-11-14 19:25:50,824 - lct - INFO - -------- LIGHT NUM: 1 ---------
+2015-11-14 19:25:50,824 - lct - INFO - -------- NAME: DINING TABLE --------
+2015-11-14 19:25:50,824 - lct - INFO - -------- COLOR: {u'hue': 44.14373998626688, u'saturation': 0.7074998092622263, u'kelvin': 3730} ---------
+2015-11-14 19:25:50,824 - lct - INFO - -------- BRIGHT: 0.681620508125 ---------
+2015-11-14 19:25:50,824 - lct - INFO - -------- POWER:  on ---------
+2015-11-14 19:25:50,824 - lct - INFO - ///////////
+2015-11-14 19:25:51,459 - lct - DEBUG - on
+2015-11-14 19:25:51,460 - lct.lut - INFO - EXTENDED SUNLIGHT MODE
+2015-11-14 19:25:51,460 - lct.lut - DEBUG - next_rising:  2015-06-21 05:24:55.000006
+2015-11-14 19:25:51,460 - lct.lut - DEBUG - next_noon: 2015-06-21 12:57:37.000006
+2015-11-14 19:25:51,461 - lct.lut - DEBUG - next_setting: 2015-06-20 20:30:05.000005
+2015-11-14 19:25:51,462 - lct - INFO - notifying controller of power state switch on
+2015-11-14 19:25:51,462 - lct.lut - INFO - currently in state:        mid-day-end
+2015-11-14 19:25:51,462 - lct.lut - INFO - current state start time:  0.7016
+2015-11-14 19:25:51,462 - lct.lut - INFO - cur_time:                  0.809618055556
+2015-11-14 19:25:51,462 - lct.lut - INFO - next state:                sunset
+2015-11-14 19:25:51,462 - lct.lut - INFO - next state start time:     0.854224537037
+2015-11-14 19:25:51,462 - lct.lut - DEBUG - abs time in to this state: 0.108018055556
+2015-11-14 19:25:51,462 - lct.lut - DEBUG - frac in:                   0.70773715454
+2015-11-14 19:25:51,463 - lct.lut - DEBUG - cur_hue:                   44.1547430908
+2015-11-14 19:25:51,463 - lct.lut - DEBUG - cur_sat:                   0.70773715454
+2015-11-14 19:25:51,463 - lct.lut - DEBUG - cur_bright:                0.681518280457
+2015-11-14 19:25:51,463 - lct.lut - DEBUG - cur_kelvin:                3730
+2015-11-14 19:25:51,463 - lct - INFO - put request: kelvin:3730 hue:44.1547430908 saturation:0.70773715454 brightness:0.681518280457, on, 1.0s
+2015-11-14 19:25:52,250 - lct - INFO - <Response [207]>
+2015-11-14 19:25:52,250 - lct.lut - DEBUG - secs to next state:        3853.0
+2015-11-14 19:25:52,250 - lct - INFO - transitioning to:          sunset
+2015-11-14 19:25:52,250 - lct - INFO - over:                      3853.0
+2015-11-14 19:25:52,935 - lct - INFO - put request: kelvin:3000 hue:50 saturation:1.0 brightness:0.55, on, 3853.0s
+2015-11-14 19:25:53,480 - lct - INFO - <Response [207]>
+2015-11-14 19:25:53,480 - lct - INFO - WAITING 3854.0s TO NEXT TRANSITION
+2015-11-14 19:25:53,480 - lct.lut - INFO - currently in state:        mid-day-end
+2015-11-14 19:25:53,480 - lct.lut - INFO - current state start time:  0.7016
+2015-11-14 19:25:53,480 - lct.lut - INFO - cur_time:                  0.809641203704
+2015-11-14 19:25:53,481 - lct.lut - INFO - next state:                sunset
+2015-11-14 19:25:53,481 - lct.lut - INFO - next state start time:     0.854224537037
+2015-11-14 19:25:53,481 - lct.lut - DEBUG - abs time in to this state: 0.108041203704
+2015-11-14 19:25:53,481 - lct.lut - DEBUG - frac in:                   0.707888821818
+2015-11-14 19:25:53,481 - lct.lut - DEBUG - cur_hue:                   44.1577764364
+2015-11-14 19:25:53,481 - lct.lut - DEBUG - cur_sat:                   0.707888821818
+2015-11-14 19:25:53,481 - lct.lut - DEBUG - cur_bright:                0.681450030182
+2015-11-14 19:25:53,481 - lct.lut - DEBUG - cur_kelvin:                3730
+2015-11-14 19:25:53,481 - lct.lut - DEBUG - secs to next state:        3852.0
+2015-11-14 19:25:53,482 - lct - INFO - *** Server listening on port 7777 ****
+2015-11-14 19:25:53,482 - lct.lut - DEBUG - secs to next state:        3852.0
+2015-11-14 19:25:53,482 - lct - INFO - transitioning to:          sunset
+2015-11-14 19:25:53,482 - lct - INFO - over:                      3852.0
+2015-11-14 19:25:54,003 - lct - INFO - put request: kelvin:3000 hue:50 saturation:1.0 brightness:0.55, on, 3852.0s
+2015-11-14 19:25:54,612 - lct - INFO - <Response [207]>
+2015-11-14 19:25:54,612 - lct - INFO - WAITING 3853.0s TO NEXT TRANSITION
+2015-11-14 20:30:07,482 - lct.lut - DEBUG - secs to next state:        7193.0
+2015-11-14 20:30:07,484 - lct - INFO - transitioning to:          bed
+2015-11-14 20:30:07,484 - lct - INFO - over:                      7193.0
+2015-11-14 20:30:08,383 - lct - INFO - put request: kelvin:2500 hue:20 saturation:1.0 brightness:0.05, on, 7193.0s
+2015-11-14 20:30:08,925 - lct - INFO - <Response [207]>
+2015-11-14 20:30:08,925 - lct - INFO - WAITING 7194.0s TO NEXT TRANSITION
+2015-11-14 20:30:08,926 - lct.lut - DEBUG - secs to next state:        7192.0
+2015-11-14 20:30:08,926 - lct - INFO - transitioning to:          bed
+2015-11-14 20:30:08,926 - lct - INFO - over:                      7192.0
+2015-11-14 20:30:09,331 - lct - INFO - put request: kelvin:2500 hue:20 saturation:1.0 brightness:0.05, on, 7192.0s
+2015-11-14 20:30:09,885 - lct - INFO - <Response [207]>
+2015-11-14 20:30:09,885 - lct - INFO - WAITING 7193.0s TO NEXT TRANSITION
+2015-11-14 22:30:02,886 - lct.lut - DEBUG - secs to next state:        5398.0
+2015-11-14 22:30:02,888 - lct - INFO - transitioning to:          overnight
+2015-11-14 22:30:02,888 - lct - INFO - over:                      5398.0
+2015-11-14 22:30:03,703 - lct - INFO - put request: kelvin:2500 hue:0 saturation:1.0 brightness:0.02, on, 5398.0s
+2015-11-14 22:30:04,282 - lct - INFO - <Response [207]>
+2015-11-14 22:30:04,283 - lct - INFO - WAITING 5399.0s TO NEXT TRANSITION
+2015-11-14 22:30:04,283 - lct.lut - DEBUG - secs to next state:        5396.0
+2015-11-14 22:30:04,283 - lct - INFO - transitioning to:          overnight
+2015-11-14 22:30:04,283 - lct - INFO - over:                      5396.0
+2015-11-14 22:30:04,725 - lct - INFO - put request: kelvin:2500 hue:0 saturation:1.0 brightness:0.02, on, 5396.0s
+2015-11-14 22:30:05,373 - lct - INFO - <Response [207]>
+2015-11-14 22:30:05,374 - lct - INFO - WAITING 5397.0s TO NEXT TRANSITION
+2015-11-15 14:20:05,140 - lct - INFO - <<<<<<<<<<<<<<<<<< SYSTEM RESTART >>>>>>>>>>>>>>>>>>>>>
+2015-11-15 14:20:06,831 - lct - INFO - TESTING.......
+2015-11-15 14:20:06,831 - lct - INFO - -----------------
+2015-11-15 14:20:06,832 - lct - INFO - -------- LIGHT NUM: 0 ---------
+2015-11-15 14:20:06,832 - lct - INFO - -------- NAME: KITCHEN --------
+2015-11-15 14:20:06,832 - lct - INFO - -------- COLOR: {u'hue': 0.0, u'saturation': 0.0, u'kelvin': 8000} ---------
+2015-11-15 14:20:06,832 - lct - INFO - -------- BRIGHT: 0.749996185245 ---------
+2015-11-15 14:20:06,832 - lct - INFO - -------- POWER:  on ---------
+2015-11-15 14:20:06,832 - lct - INFO - ///////////
+2015-11-15 14:20:06,832 - lct - INFO - -------- LIGHT NUM: 1 ---------
+2015-11-15 14:20:06,832 - lct - INFO - -------- NAME: DINING TABLE --------
+2015-11-15 14:20:06,832 - lct - INFO - -------- COLOR: {u'hue': 0.0, u'saturation': 0.0, u'kelvin': 8000} ---------
+2015-11-15 14:20:06,832 - lct - INFO - -------- BRIGHT: 0.749996185245 ---------
+2015-11-15 14:20:06,832 - lct - INFO - -------- POWER:  on ---------
+2015-11-15 14:20:06,833 - lct - INFO - ///////////
+2015-11-15 14:20:07,775 - lct - DEBUG - on
+2015-11-15 14:20:07,776 - lct.lut - INFO - EXTENDED SUNLIGHT MODE
+2015-11-15 14:20:07,776 - lct.lut - DEBUG - next_rising:  2015-06-21 05:24:55.000006
+2015-11-15 14:20:07,776 - lct.lut - DEBUG - next_noon: 2015-06-21 12:57:37.000006
+2015-11-15 14:20:07,777 - lct.lut - DEBUG - next_setting: 2015-06-20 20:30:05.000005
+2015-11-15 14:20:07,779 - lct - INFO - notifying controller of power state switch on
+2015-11-15 14:20:07,779 - lct.lut - INFO - currently in state:        noon
+2015-11-15 14:20:07,779 - lct.lut - INFO - current state start time:  0.540011574074
+2015-11-15 14:20:07,779 - lct.lut - INFO - cur_time:                  0.597303240741
+2015-11-15 14:20:07,779 - lct.lut - INFO - next state:                mid-day-end
+2015-11-15 14:20:07,779 - lct.lut - INFO - next state start time:     0.7016
+2015-11-15 14:20:07,780 - lct.lut - DEBUG - abs time in to this state: 0.0572916666667
+2015-11-15 14:20:07,780 - lct.lut - DEBUG - frac in:                   0.354553033971
+2015-11-15 14:20:07,780 - lct.lut - DEBUG - cur_hue:                   30.0
+2015-11-15 14:20:07,780 - lct.lut - DEBUG - cur_sat:                   0.0
+2015-11-15 14:20:07,780 - lct.lut - DEBUG - cur_bright:                1.0
+2015-11-15 14:20:07,780 - lct.lut - DEBUG - cur_kelvin:                5500
+2015-11-15 14:20:07,780 - lct - INFO - put request: hue:30.0 saturation:0.0 brightness:1.0 kelvin:5500, on, 1.0s
+2015-11-15 14:20:08,745 - lct - INFO - <Response [207]>
+2015-11-15 14:20:08,745 - lct.lut - DEBUG - secs to next state:        9010.24
+2015-11-15 14:20:08,746 - lct - INFO - transitioning to:          mid-day-end
+2015-11-15 14:20:08,746 - lct - INFO - over:                      9010.24
+2015-11-15 14:20:09,415 - lct - INFO - put request: hue:30 saturation:0 brightness:1.0 kelvin:5500, on, 9010.24s
+2015-11-15 14:20:10,228 - lct - INFO - <Response [207]>
+2015-11-15 14:20:10,228 - lct - INFO - WAITING 9011.24s TO NEXT TRANSITION
+2015-11-15 14:20:10,228 - lct.lut - INFO - currently in state:        noon
+2015-11-15 14:20:10,229 - lct.lut - INFO - current state start time:  0.540011574074
+2015-11-15 14:20:10,229 - lct.lut - INFO - cur_time:                  0.597337962963
+2015-11-15 14:20:10,229 - lct.lut - INFO - next state:                mid-day-end
+2015-11-15 14:20:10,229 - lct.lut - INFO - next state start time:     0.7016
+2015-11-15 14:20:10,229 - lct.lut - DEBUG - abs time in to this state: 0.0573263888889
+2015-11-15 14:20:10,229 - lct.lut - DEBUG - frac in:                   0.354767914598
+2015-11-15 14:20:10,229 - lct.lut - DEBUG - cur_hue:                   30.0
+2015-11-15 14:20:10,229 - lct.lut - DEBUG - cur_sat:                   0.0
+2015-11-15 14:20:10,229 - lct.lut - DEBUG - cur_bright:                1.0
+2015-11-15 14:20:10,229 - lct.lut - DEBUG - cur_kelvin:                5500
+2015-11-15 14:20:10,229 - lct.lut - DEBUG - secs to next state:        9008.24
+2015-11-15 14:20:10,230 - lct - INFO - *** Server listening on port 7777 ****
+2015-11-15 14:20:10,230 - lct.lut - DEBUG - secs to next state:        9008.24
+2015-11-15 14:20:10,230 - lct - INFO - transitioning to:          mid-day-end
+2015-11-15 14:20:10,230 - lct - INFO - over:                      9008.24
+2015-11-15 14:20:10,903 - lct - INFO - put request: hue:30 saturation:0 brightness:1.0 kelvin:5500, on, 9008.24s
+2015-11-15 14:20:11,689 - lct - INFO - <Response [207]>
+2015-11-15 14:20:11,689 - lct - INFO - WAITING 9009.24s TO NEXT TRANSITION
