@@ -22,6 +22,8 @@ You'll need to put your LIFX HTTP API token into a file called 'user_data.json',
 
 You can generate that token for your account here: https://cloud.lifx.com/settings
 
+Yes, the one above is a dummy.
+
 Run script is lifx_bg.py ...
 That hosts a bootstrap HTTP controller avail at localhost:7777 with a power toggle for now ... will be adding a bypass to that sometime soon so you can override the LUT behavior and manually control settings.
 
