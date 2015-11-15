@@ -10,6 +10,7 @@ Lat/Long settings in that LUT are used to allow Pyephem to extract and localize 
 If you enable the 'extended-sunlight-mode' flag, those events will be localized based on their timings during the day of the Summer solstice. - I leave that feature on as I enjoy the 'SAD'-fighting effects of extended blue light during the short Winter days, but if you want to strictly mimic the sun's behavior, turn it off.
 
 You'll need to put your LIFX HTTP API token into a file called 'user_data.json', in the 'token' field ... that file should look like this:
+
 --- BEGIN user_data.json ---
 
 {
@@ -17,6 +18,7 @@ You'll need to put your LIFX HTTP API token into a file called 'user_data.json',
 }
 
 --- END user_data.json ---
+
 
 You can generate that token for your account here: https://cloud.lifx.com/settings
 
