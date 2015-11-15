@@ -1,8 +1,7 @@
 # -*- coding: utf-8 -*-
 """
-Created on Fri Nov  6 12:37:06 2015
-
-@author: handsheik
+@author: Noah Norman
+n@hardwork.party
 """
 
 class LightState(object):

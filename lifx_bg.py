@@ -8,7 +8,6 @@ n@hardwork.party
 
 TO DO:
 • HTTP BYPASS SWITCH
-• AUTO - FIRE NEXT CUE
 • CONFIRM SWITCH RESPONSE
 """
 
@@ -182,10 +181,10 @@ inf('<<<<<<<<<<<<<<<<<< SYSTEM RESTART >>>>>>>>>>>>>>>>>>>>>')
 
 test_connection()
 
-# background update sunrise / sunset every day
-ms_in_a_day = 60 * 60 * 24 * 1000
+# update sunrise / sunset every day
+MS_DAY = 60 * 60 * 24 * 1000
 refresh_solar_info = tornado.ioloop.PeriodicCallback(LUT.refresh_solar(),
-                                                     ms_in_a_day)
+                                                     MS_DAY)
 refresh_solar_info.start()
 
 

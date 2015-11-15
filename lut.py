@@ -1,8 +1,7 @@
 # -*- coding: utf-8 -*-
 """
-Created on Fri Nov 13 12:34:33 2015
-
-@author: handsheik
+@author: Noah Norman
+n@hardwork.party
 """
 
 import ephem
