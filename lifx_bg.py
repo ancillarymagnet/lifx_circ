@@ -1,6 +1,6 @@
-#!/usr/bin python
-
 # -*- coding: utf-8 -*-
+#!/usr/bin/env python
+
 """
 lifx_bg.py 
 a circadian light controller and interface for LIFX HTTP API v1
@@ -11,9 +11,9 @@ n@hardwork.party
 TO DO:
 • HTTP BYPASS SWITCH
 • CONFIRM SWITCH RESPONSE
+• ARGUMENTS FOR ALL OR LIGHT NAMES
 """
 
-#import datetime
 import json
 import requests
 import time
