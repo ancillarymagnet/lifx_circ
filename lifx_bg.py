@@ -11,7 +11,7 @@ n@hardwork.party
 TO DO:
 • HTTP BYPASS SWITCH
 • CONFIRM SWITCH RESPONSE
-• ARGUMENTS FOR ALL OR LIGHT NAMES
+• ARGUMENTS / JSON in data.json FOR ALL or SPECIFIC LIGHT NAMES
 """
 
 import json
@@ -80,8 +80,8 @@ def test_connection():
     response_json = get_states()
     inf('TESTING.......')
     inf('-----------------')
-    for light_num, rsp in enumerate(response_json):
-        inf('-------- LIGHT NUM: ' + str(light_num) + ' ---------')
+    for num, rsp in enumerate(response_json):
+        inf('-------- LIGHT NUM: ' + str(num) + ' ---------')
         inf('-------- NAME: ' + str(rsp[u'label']) + ' --------')
         inf('-------- COLOR: ' + str(rsp[u'color']) + ' ---------')
         inf('-------- BRIGHT: ' + str(rsp[u'brightness']) + ' ---------')
@@ -96,6 +96,7 @@ def is_on():
         return False
 
 def power_state():
+    """ assumes all lights share the same state """
     response_json = get_states()
     return response_json[1][u'power']
 
@@ -118,15 +119,15 @@ def switch(pwr, from_controller):
         t = config.fade_out()
     set_all_to_hsbkdp(c_st.hue, c_st.sat, c_st.bright,
                       c_st.kelvin, t, pwr)
-    # this command broke the existing transition so we have to put a new one
+    # that command broke the existing transition so we have to put a new one
     yield gen.Task(tornado.ioloop.IOLoop.instance().add_timeout, time.time() + t)
     goto_next_state()
 
-def start():
-    st = LUT.state_now()
-    set_all_to_hsbkdp(st.hue, st.sat, st.bright, st.kelvin, config.fade_in())
-    t = LUT.secs_to_next_state()
-    go_next_in(t)
+#def start():
+#    st = LUT.state_now()
+#    set_all_to_hsbkdp(st.hue, st.sat, st.bright, st.kelvin, config.fade_in())
+#    t = LUT.secs_to_next_state()
+#    go_next_in(t)
 
 def goto_next_state():
     nxt_st = LUT.next_state()
@@ -170,7 +171,7 @@ def set_all_to_hsbkdp(hue, saturation, brightness, kelvin,
 def put_request(c_s, pwr, duration):
     """ take a formatted color string and duration float
     and put that request to the LIFX API """
-    inf('put request: {}, {}, {}s'.format(c_s, pwr, duration))
+    inf('**** put request: {}, {}, {}s'.format(c_s, pwr, duration))
     data = json.dumps(
         {'selector':'all',
          'power': pwr,
@@ -193,7 +194,7 @@ refresh_solar_info.start()
 
 
 switch('on', False)
-goto_next_state()
+#goto_next_state()
 print 'state now: ' + str(LUT.state_now())
 print 'next state: ' + str(LUT.next_state())
 print 'secs to next state: ' + str(LUT.secs_to_next_state())

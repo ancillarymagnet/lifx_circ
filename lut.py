@@ -47,6 +47,8 @@ class Lut(object):
         for st in localized_lut:
             if st.name == 'sunrise':
                 st.start = convert.datetime_to_day_frac(sunrise)
+            elif st.name == 'sunrise-end':
+                st.start = convert.datetime_to_day_frac(sunrise)
             elif st.name == 'sunset':
                 st.start = convert.datetime_to_day_frac(sunset)
             elif st.name == 'noon':
