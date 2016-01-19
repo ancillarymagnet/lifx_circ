@@ -28,7 +28,7 @@ def make_logger():
     # define a Handler which writes INFO messages or higher to the sys.stderr
     console = logging.StreamHandler()
     console.setLevel(logging.INFO)
-    formatter = logging.Formatter('%(name)-12s: %(levelname)-8s %(message)s')
+    formatter = logging.Formatter('%(asctime)s - %(name)-12s: %(levelname)-8s %(message)s')
     console.setFormatter(formatter)
     logging.getLogger('').addHandler(console)    
     return logger
