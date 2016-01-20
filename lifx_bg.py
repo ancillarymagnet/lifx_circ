@@ -123,12 +123,6 @@ def switch(pwr, from_controller):
     yield gen.Task(tornado.ioloop.IOLoop.instance().add_timeout, time.time() + t)
     goto_next_state()
 
-#def start():
-#    st = LUT.state_now()
-#    set_all_to_hsbkdp(st.hue, st.sat, st.bright, st.kelvin, config.fade_in())
-#    t = LUT.secs_to_next_state()
-#    go_next_in(t)
-
 def goto_next_state():
     nxt_st = LUT.next_state()
     t = LUT.secs_to_next_state()
@@ -194,7 +188,6 @@ refresh_solar_info.start()
 
 
 switch('on', False)
-#goto_next_state()
 print 'state now: ' + str(LUT.state_now())
 print 'next state: ' + str(LUT.next_state())
 print 'secs to next state: ' + str(LUT.secs_to_next_state())

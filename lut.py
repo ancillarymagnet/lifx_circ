@@ -156,6 +156,7 @@ class Lut(object):
         return nxt_st
 
     def refresh_solar(self):
+        inf('refreshing solar')
         self.loc_lut = self.__localize_and_sort(self.data)
 
 
