@@ -182,8 +182,7 @@ test_connection()
 
 # update sunrise / sunset every day
 MS_DAY = 60 * 60 * 24 * 1000
-refresh_solar_info = tornado.ioloop.PeriodicCallback(LUT.refresh_solar(),
-                                                     MS_DAY)
+refresh_solar_info = tornado.ioloop.PeriodicCallback(LUT.refresh_solar(),                                                     MS_DAY)
 refresh_solar_info.start()
 
 
