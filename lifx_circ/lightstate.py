@@ -1,11 +1,13 @@
-# -*- coding: utf-8 -*-
 #!/usr/bin/env python
+# -*- coding: utf-8 -*-
 """
 @author: Noah Norman
 n@hardwork.party
 """
 
+
 class LightState(object):
+
     def __init__(self, name, bright, start,
                  hue=None, sat=None, kelvin=None):
         self.name = name
@@ -26,7 +28,7 @@ class LightState(object):
         rep += "hue: {}, ".format(self.hue)
         rep += "sat: {}, ".format(self.sat)
         rep += "kelvin: {} ".format(self.kelvin)
-        return  rep
+        return rep
 
     def is_color(self):
         return self.type is "color"

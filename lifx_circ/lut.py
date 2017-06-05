@@ -13,7 +13,9 @@ import logging
 
 DATA_PATH = 'lut.json'
 
+
 class Lut(object):
+
     def __init__(self):
         self.data = self.__load_file()
         self.loc_lut = self.__localize_and_sort(self.data)
@@ -63,7 +65,7 @@ class Lut(object):
 
     def __sun_events(self):
         o = ephem.Observer()
-        o.horizon = '-0:34' # navy almanac
+        o.horizon = '-0:34'  # navy almanac
         o.pressure = 0
         o.lat = str(self.data['lat'])
         o.long = str(self.data['long'])
@@ -81,7 +83,7 @@ class Lut(object):
         dbg('next_noon: ' + str(next_noon_time))
         beg_twilight = ephem.localtime(o.previous_rising(ephem.Sun(),
                                                          use_center=True))
-                                                         #Begin civil twilight
+        # Begin civil twilight
         next_set_time = ephem.localtime(o.next_setting(sun))
         dbg('next_setting: ' + str(next_set_time))
         return next_rise_time, next_set_time, next_noon_time, beg_twilight
@@ -124,13 +126,13 @@ class Lut(object):
         dbg('cur_hue:                   ' + str(cur_hue))
 
         cur_sat = convert.interp(st.sat, nxt_st.sat, frac_in)
-        dbg('cur_sat:                   '+str(cur_sat))
+        dbg('cur_sat:                   ' + str(cur_sat))
 
         cur_bright = convert.interp(st.bright, nxt_st.bright, frac_in)
-        dbg('cur_bright:                '+str(cur_bright))
+        dbg('cur_bright:                ' + str(cur_bright))
 
         cur_kelvin = int(convert.interp(st.kelvin, nxt_st.kelvin, frac_in))
-        dbg('cur_kelvin:                '+str(cur_kelvin))
+        dbg('cur_kelvin:                ' + str(cur_kelvin))
 
         cur_st = LightState(st.name, cur_bright, st.start,
                             cur_hue, cur_sat, cur_kelvin)
@@ -163,7 +165,9 @@ class Lut(object):
 def inf(msg):
     LOGGER.info(msg)
 
+
 def dbg(msg):
     LOGGER.debug(msg)
+
 
 LOGGER = logging.getLogger('lct.lut')
