@@ -7,7 +7,6 @@ Created on Mon Nov  9 10:52:58 2015
 
 import config
 import logging
-import time
 import websocket
 
 SERV_PORT = '7777'
@@ -20,7 +19,7 @@ logger.info('LAUNCHING SCHEDULER')
 config.init()
 
 websocket.enableTrace(True)
-logger.info('attempting to connect to: ' )
+logger.info('attempting to connect to: ')
 WS = websocket.create_connection('ws://' + str(HOST) + ':' + SERV_PORT + URI)
 
 

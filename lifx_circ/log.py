@@ -1,5 +1,5 @@
-# -*- coding: utf-8 -*-
 #!/usr/bin/env python
+# -*- coding: utf-8 -*-
 """
 @author: Noah Norman
 n@hardwork.party
@@ -10,12 +10,12 @@ import logging.handlers
 
 LOG_FILENAME = 'logs/lifx_circ_trig.log'
 
+
 def make_logger():
     logger = logging.getLogger('lct')
     logger.setLevel(logging.DEBUG)
     # create file handler which logs even debug messages
-    fh = logging.handlers.RotatingFileHandler(
-                          LOG_FILENAME, maxBytes=50000, backupCount=5)
+    fh = logging.handlers.RotatingFileHandler(LOG_FILENAME, maxBytes=50000, backupCount=5)
     fh.setLevel(logging.DEBUG)
     # create console handler with a higher log level
     ch = logging.StreamHandler()
@@ -30,5 +30,5 @@ def make_logger():
     console.setLevel(logging.INFO)
     formatter = logging.Formatter('%(asctime)s - %(name)-12s: %(levelname)-8s %(message)s')
     console.setFormatter(formatter)
-    logging.getLogger('').addHandler(console)    
+    logging.getLogger('').addHandler(console)
     return logger
